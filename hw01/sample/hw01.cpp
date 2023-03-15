@@ -26,8 +26,7 @@ class fibMem
 		}
 		void print ()
 		{
-			for ( int x : v )
-				std::cout << std::dec << x << " ";
+			for ( int x : v ) std::cout << std::dec << x << " ";
 			std::cout << "\n";
 		}
 };
@@ -56,22 +55,18 @@ int myPower ( int base, int exp )
 void reverseVec ( std::vector<bool> & r )
 {
 	std::vector<bool> v;
-	for (int i = r.size() - 1; i >= 0; --i)
-		v.push_back ( r[i] );
+	for (int i = r.size() - 1; i >= 0; --i) v.push_back ( r[i] );
 	r.clear();
-	for ( auto x : v )
-		r.push_back ( x );
+	for ( auto x : v ) r.push_back ( x );
 }
 
 std::vector<bool> decToFibBin ( int q, fibMem f )
 {
 	std::vector<bool> v;
 	q++;
-	while ( q > f.v[f.i-1] )
-		fibGenerator( f, f.i + 1 );
+	while ( q > f.v[f.i-1] ) fibGenerator( f, f.i + 1 );
 	int j = f.i - 1;
-	while ( q < f.v[j] )
-		j--;
+	while ( q < f.v[j] ) j--;
 	while ( j != -1 )
 	{
 		v.push_back( q >= f.v[j] );
@@ -89,15 +84,15 @@ int binToDec ( std::vector<bool> v )
 	int sum = 0, e = 128;
 	for (int i = 0; i < 8; ++i)
 	{
-		if ( v[i] )
-			sum += e;
+		if ( v[i] ) sum += e;
 		e /= 2;
 	}
 	return sum;
 }
 
-void decToFib ( std::ofstream & out, int sum, fibMem & f, std::vector<bool> & wbyte )
+bool decToFib ( std::ofstream & out, int sum, fibMem & f, std::vector<bool> & wbyte )
 {
+	if ( sum > 1114111 ) return false;
 	std::vector<bool> ret = decToFibBin ( sum , f );
 	for ( bool x : ret )
 	{
@@ -106,31 +101,36 @@ void decToFib ( std::ofstream & out, int sum, fibMem & f, std::vector<bool> & wb
 		{
 			reverseVec( wbyte );
 			out.put ( binToDec ( wbyte ) );
+			if ( out.fail ( ) )  return false;
 			wbyte.clear();
 		}
 	}
+	return true;
 }
 
-bool interpretUTF8Byte ( std::ofstream & out, std::vector<bool> & b, int & sum, fibMem & f, char c, std::vector<bool> & wbyte, int  & e )
+bool interpretUTF8Byte ( std::ofstream & out, std::vector<bool> & b, int & sum, fibMem & f, char c, std::vector<bool> & wbyte, int  & e, int & nextBytes )
 {
 	if ( !b[0] )
 	{
-		decToFib ( out, (int) c, f, wbyte );
+		if ( nextBytes != 0 ) return false;
+		if ( ! decToFib ( out, (int) c, f, wbyte ) ) return false;
 		sum = 0;
 	}
 	else if ( b[0] && !b[1] )
 	{
+		if ( nextBytes <= 0 ) return false;
+		nextBytes--;
 		for ( int i = 2; i < 8; ++i ) sum += myPower ( 2, e-- ) * b[i];
 		if ( e <= 0 )
 		{
-			decToFib ( out, sum, f, wbyte );
+			if ( ! decToFib ( out, sum, f, wbyte ) ) return false;
 			sum = 0;
 			e = 0;
 		}
 	}
-	else if ( b[0] &&  b[1] && !b[2] ) 					 { e = 10; for ( int i = 3; i < 8; ++i ) sum += myPower ( 2, e-- ) * b[i]; }
-	else if ( b[0] &&  b[1] &&  b[2] && !b[3] ) 		 { e = 15; for ( int i = 4; i < 8; ++i ) sum += myPower ( 2, e-- ) * b[i]; }
-	else if ( b[0] &&  b[1] &&  b[2] &&  b[3] && !b[4] ) { e = 20; for ( int i = 5; i < 8; ++i ) sum += myPower ( 2, e-- ) * b[i]; }
+	else if ( b[0] &&  b[1] && !b[2] ) 					 { if ( nextBytes != 0 ) return false; e = 10; for ( int i = 3; i < 8; ++i ) sum += myPower ( 2, e-- ) * b[i]; nextBytes = 1; }
+	else if ( b[0] &&  b[1] &&  b[2] && !b[3] ) 		 { if ( nextBytes != 0 ) return false; e = 15; for ( int i = 4; i < 8; ++i ) sum += myPower ( 2, e-- ) * b[i]; nextBytes = 2; }
+	else if ( b[0] &&  b[1] &&  b[2] &&  b[3] && !b[4] ) { if ( nextBytes != 0 ) return false; e = 20; for ( int i = 5; i < 8; ++i ) sum += myPower ( 2, e-- ) * b[i]; nextBytes = 3; }
 	else return false;
 	return true;
 }
@@ -139,21 +139,20 @@ bool utf8ToFibonacci ( const char * inFile, const char * outFile )
 {
 	std::ifstream in( inFile, std::ios::binary | std::ios::in );
 	std::ofstream out( outFile, std::ios::binary | std::ios::out );
-	if ( ! in.is_open() || ! out.is_open() ) return false;
-	out.clear();
+	if ( ! in || ! out ) return false;
 	in  . seekg ( 0, std::ios::beg );
 	out . seekp ( 0, std::ios::beg );
-	char c;
 	fibMem f;
 	std::vector<bool> wbyte;
-	int sum = 0, e = 0;
+	int sum = 0, e = 0, nB = 0;
+	char c;
 	while ( in.get ( c ) )
 	{
 		std::vector<bool> byte;
-		for ( int i = 7; i >= 0; --i )
-			byte.push_back(  ( ( c >> i ) & 1 ) );
-		if ( ! interpretUTF8Byte ( out, byte, sum, f, c, wbyte, e ) ) return false;
+		for ( int i = 7; i >= 0; --i ) byte.push_back(  ( ( c >> i ) & 1 ) );
+		if ( ! interpretUTF8Byte ( out, byte, sum, f, c, wbyte, e, nB ) ) return false;
 	}
+	if ( nB != 0 ) return false;
 	if ( ! wbyte.empty() )
 	{
 		while ( wbyte.size() % 8 != 0 ) wbyte.push_back(false);
@@ -170,11 +169,7 @@ void interpretFibByte ( std::vector<bool> & b, int & sum, fibMem & f, std::vecto
 	{
 		fibGenerator( f, fibIndex + 1 );
 		if ( last && x ) { wr.push_back( --sum ); sum = 0; fibIndex = -1; last = false; }
-		else 
-		{
-			sum += x * f.v[fibIndex];
-			last = x;
-		}
+		else  { sum += x * f.v[fibIndex];last = x; }
 		fibIndex ++;
 	}
 	b.clear();
@@ -192,12 +187,14 @@ void getSumXToYwithZ ( int & sum, int & c, int x, int y, int z )
 bool writeUTF8 ( std::ofstream & out, int c )
 {
 	int sum = 0;
-	if      ( c <= 127 ) out.put ( (char) c );
+	if ( c > 1114111 ) return false;
+	if      ( c <= 127 ) { out.put ( (char) c ); if ( out.fail ( ) )  return false; }
 	else if ( c <= 2047 )
 	{
 		sum = 192;
 		getSumXToYwithZ ( sum, c, 10, 6, 64 );
 		out.put ( (char) sum );
+		if ( out.fail ( ) )  return false;
 		sum = 128;
 		getSumXToYwithZ ( sum, c, 5, 0, 1 );
 		out.put ( (char) sum );
@@ -207,6 +204,7 @@ bool writeUTF8 ( std::ofstream & out, int c )
 		sum = 224;
 		getSumXToYwithZ ( sum, c, 15, 12, 4096 );
 		out.put ( (char) sum );
+		if ( out.fail ( ) )  return false;
 		sum = 128;
 		getSumXToYwithZ ( sum, c, 11, 6, 64 );
 		out.put ( (char) sum );
@@ -219,6 +217,7 @@ bool writeUTF8 ( std::ofstream & out, int c )
 		sum = 240;
 		getSumXToYwithZ ( sum, c, 20, 18, 262144 );
 		out.put ( (char) sum );
+		if ( out.fail ( ) ) return false;
 		sum = 128;
 		getSumXToYwithZ ( sum, c, 17, 12, 4096 );
 		out.put ( (char) sum );
@@ -237,21 +236,20 @@ bool fibonacciToUtf8 ( const char * inFile, const char * outFile )
 {
 	std::ifstream in( inFile, std::ios::binary | std::ios::in );
 	std::ofstream out( outFile, std::ios::binary | std::ios::out );
-	if ( ! in.is_open() || ! out.is_open() ) return false;
+	if ( ! in || ! out ) return false;
 	out.clear();
 	in  . seekg ( 0, std::ios::beg );
-	out . seekp ( 0, std::ios::beg );
-	char c;
 	fibMem f;
 	int sum = 0, fibIndex = 0;
 	std::vector<bool> byte;
 	bool last = false;
+	char c;
 	while ( in.get ( c ) )
 	{
 		std::vector<int> wr;
 		for ( int i = 0; i < 8 ; ++i ) byte.push_back(  ( ( c >> i ) & 1 ) );
 		interpretFibByte ( byte, sum, f, wr, last, fibIndex);
-		for ( int x : wr ) if ( ! writeUTF8 ( out, x ) ) return false;
+		for ( int x : wr ) if ( ! writeUTF8 ( out, x ) || x > 1114111 ) return false;
 		wr.clear();
 		if ( fibIndex >= 32 ) return false;
 	}
@@ -274,12 +272,9 @@ bool identicalFiles ( const char * file1, const char * file2 )
 	{
 		getline ( f1, s1 );
 		getline ( f2, s2 );
-		if ( s1 != s2 )
-			return false;
-		if ( f1.eof() && f2.eof() )
-			break;
-		if ( f1.eof() || f2.eof() )
-			return false;
+		if ( s1 != s2 ) return false;
+		if ( f1.eof() && f2.eof() ) break;
+		if ( f1.eof() || f2.eof() ) return false;
 	}
 	return true;
 }
@@ -298,6 +293,10 @@ int main ( int argc, char * argv [] )
 	assert ( fibonacciToUtf8 ( "example/src_9.fib", "output.utf8" ) && identicalFiles ( "output.utf8", "example/dst_9.utf8" ) );
 	assert ( fibonacciToUtf8 ( "example/src_10.fib", "output.utf8" ) && identicalFiles ( "output.utf8", "example/dst_10.utf8" ) );
 	assert ( ! fibonacciToUtf8 ( "example/src_11.fib", "output.utf8" ) );
+	assert ( ! utf8ToFibonacci ( "example/src_20.utf8", "output.fib" ) );
+	assert ( ! utf8ToFibonacci ( "in_5024961.bin", "output.fib" ) );
+	assert ( ! fibonacciToUtf8 ( "src_0.fib", "output.fib" ) );
+	assert ( ! utf8ToFibonacci ( "in_5027229.bin", "output.fib" ) );
 
 	return EXIT_SUCCESS;
 }
