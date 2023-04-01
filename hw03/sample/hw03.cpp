@@ -28,46 +28,16 @@ class CRangeList;
 class CRange
 {
 	public:
-		CRange ( long long l, long long h ) : l(l), h(h) 
-		{
-			if ( l > h ) throw std::logic_error("Nespravny vstup\n");
-		}
-		long long low () const
-		{
-			return l;
-		}
-		long long high () const
-		{
-			return h;
-		}
-		bool isIn( long long x ) const
-		{
-			return ( x >= l && x <= h );
-		}
-		void setL ( long long l )
-		{
-			this->l = l;
-		}
-		void setH ( long long h )
-		{
-			this->h = h;
-		}
-		bool includes ( const CRange & r ) const
-		{
-			if ( l <= r.low() && h >= r.high() )
-				return true;
-			return false;
-		}
-		bool operator == ( const CRange & r ) const
-		{
-			return ( r.h == h && r.l == l );
-		}
-		bool operator != ( const CRange & r ) const
-		{
-			return !( r.h == h && r.l == l );
-		}
-		friend CRangeList & operator + ( const CRange & r1, const CRange & r2 );
-		friend CRangeList & operator - ( const CRange & r1, const CRange & r2 );
+		CRange ( long long l, long long h ) : l(l), h(h) { if ( l > h ) throw std::logic_error("Nespravny vstup\n"); }
+		long long low () const { return l; }
+		long long high () const { return h; }
+		void setL ( long long l ) { this->l = l; }
+		void setH ( long long h ) { this->h = h; }
+		bool includes ( const CRange & r ) const { if ( l <= r.low() && h >= r.high() ) return true; return false; }
+		bool operator == ( const CRange & r ) const { return ( r.h == h && r.l == l ); }
+		bool operator != ( const CRange & r ) const { return !( r.h == h && r.l == l ); }
+		friend CRangeList operator + ( const CRange & r1, const CRange & r2 );
+		friend CRangeList operator - ( const CRange & r1, const CRange & r2 );
 	private:
 		long long l, h;
 };
@@ -77,144 +47,103 @@ class CRangeList
 	public:
 		CRangeList () {}
 		~CRangeList () {}
-		CRangeList ( const CRangeList & list )
-		{
-			l = list.l;
-		}
-		CRangeList ( const CRange & list )
-		{
-			l.push_back(list);
-		}
-		CRangeList & operator = ( const CRangeList & list )
-		{
-			l = list.l;
-			return *this;
-		}
-		CRangeList & operator = ( const CRange & list )
-		{
-			l.push_back( list );
-			return *this;
-		}
+		CRangeList ( const CRangeList & list ) { l = list.l; }
+		CRangeList ( const CRange & list ) { l.push_back(list); }
+		CRangeList & operator = ( const CRangeList & list ) { l = list.l; return *this; }
+		CRangeList & operator = ( const CRange & list ) { l.push_back( list ); return *this; }
 		bool includes ( long long s ) const
 		{
-			for ( auto & x : l )
-				if ( x.isIn( s ) )
-					return true;
+			for ( auto & x : l ) if ( s >= x.low() && s <= x.high() ) return true;
 			return false;
 		}
 		bool includes ( const CRange & r ) const
 		{
-			for ( auto & x : l )
-				if ( x.isIn( r.low() ) && x.isIn ( r.high() ) )
-					return true;
+			for ( auto & x : l ) if ( r.low() >= x.low() && r.high() <= x.high() ) return true;
 			return false;
 		}
-		CRangeList & operator + ( const CRange & r )
+		int intersects ( const CRange & r1, const CRange & r2 ) const
 		{
-			return *this += r;
+			if ( r1.includes( r2 ) ) return -1;
+			if ( r2.includes ( r1 ) ) return -2;
+			if ( r1.low() <= r2.low() + !( r2.low() == LLONG_MAX ) && r2.low() <= r1.high() + !( r1.high() == LLONG_MAX ) && r1.high() <= r2.high() + !( r2.high() == LLONG_MAX ) )  return 1;
+			if ( r2.low() <= r1.low() + !( r1.low() == LLONG_MAX ) && r1.low() <= r2.high() + !( r2.high() == LLONG_MAX ) && r2.high() <= r1.high() + !( r1.high() == LLONG_MAX )  ) return 2;
+			if ( r1.high() < r2.low() ) return -3;
+			return 0;
 		}
-		CRangeList & operator - ( const CRange & r )
-		{
-			return *this -= r;
-		}
-		CRangeList & operator += ( const CRange & r )
+		CRangeList & operator + ( const CRange & r ) { return *this += r; }
+		CRangeList & operator - ( const CRange & r ) { return *this -= r; }
+		CRangeList & operator += ( CRange r )
 		{
 			int i = 0;
 			for ( auto & x : l )
 			{
-				if ( this->includes( r ) ) return *this; 
-				if ( r.includes ( x ) ) 
-				{ 
-					l.erase( l.begin() + i ); 
-					return *this += r; 
-				}
-				if ( x.low() <= r.low() + 1 && r.low() <= x.high() + 1 && x.high() <= r.high() + 1  ) 
+				int q = intersects ( x, r );
+				if ( q == -1 ) return *this; 
+				if ( q == -2 )  {  l.erase( l.begin() + i );  continue; }
+				if ( q == 1 ) 
 				{ 
 					x.setH( r.high() );
-					CRange x2 = x;
+					r = x;
 					l.erase( l.begin() + i );
-					return *this += x2; 
+					return *this += r;
 				}
-				if ( r.low() <= x.low() + 1 && x.low() <= r.high() + 1 && r.high() <= x.high() + 1  ) 
+				if ( q == 2 ) 
 				{ 
 					x.setL( r.low() ); 
-					CRange x2 = x;
+					r = x;
 					l.erase( l.begin() + i );
-					return *this += x2; 
+					return *this += r; 
 				}
-				if ( x.high() < r.low() )
-					i++;
+				if ( q == -3 ) i++;
+				else break;
 			}
 			l.insert( l.begin() + i, r );
 			return *this;
 		}
-		CRangeList & operator += ( const CRangeList & r )
-		{
-			for ( auto & x : r.getList() )
-				*this += x;
-			return *this;
-		}
-		CRangeList & operator -= ( const CRangeList & r )
-		{
-			for ( auto & x : r.getList() )
-				*this -= x;
-			return *this;
-		}
+		CRangeList & operator += ( const CRangeList & r ) { for ( auto & x : r.getList() ) *this += x; return *this; }
+		CRangeList & operator -= ( const CRangeList & r ) { for ( auto & x : r.getList() ) *this -= x; return *this; }
 		CRangeList & operator -= ( const CRange & r )
 		{
-			int i = 0;
+			size_t i = 0;
 			for ( auto & x : l )
 			{
-				if ( x == r )
+				if ( r.high() == LLONG_MAX && x.high() == LLONG_MAX ) x.setH( LLONG_MAX - 1 );
+				if ( r.low() == LLONG_MIN && x.low() == LLONG_MIN ) x.setL( LLONG_MIN + 1 );
+				if ( i == l.size() ) break;
+				if ( x == r ) { l.erase ( l.begin() + i ); return *this; }
+				int q = intersects ( x, r );
+				if ( q == -1 )
 				{
-					l.erase ( l.begin() + i );
-					return *this;
-				}
-				if ( x.includes( r ) )
-				{
-					//cout << x.low() << " " << x.high() << " " << r.low() << " " << r.high() << endl;
 					long long old = x.high();
-					x.setH( r.low() - 1 );
-					if ( r.high() + 1 <= old )
-						l.insert ( l.begin() + i + 1, CRange ( r.high() + 1, old ) );
+					x.setH( r.low() - !( r.low() == LLONG_MIN ) );
+					if ( r.high() + !( r.high() == LLONG_MAX ) <= old ) l.insert ( l.begin() + i + 1, CRange ( r.high() + !( r.high() == LLONG_MAX ), old ) );
 					return *this;
 				}
-				if ( r.includes( x ) )
+				if ( q == -2 )
 				{
 					l.erase ( l.begin() + i );
 					return *this -= r;
 				}
-				if ( x.low() <= r.low() + 1 && r.low() <= x.high() + 1 && x.high() <= r.high() + 1  ) 
+				if ( q == 1 ) 
 				{
-					x.setH( r.low() - 1 );
-					if ( x != *l.end() )
-						continue;
+					x.setH( r.low() - !( r.low() == LLONG_MIN ) );
+					if ( i + 1 != l.size() ) { i++; continue; }
 					return *this;
 				}
-				if ( r.low() <= x.low() + 1 && x.low() <= r.high() + 1 && r.high() <= x.high() + 1  ) 
-				{
-					x.setL( r.high() + 1 );
-					if ( x != *l.end() )
-						continue;
+				if ( q == 2 ) 
+				{ 
+					x.setL( r.high() + !( r.high() == LLONG_MAX ) );
+					if ( i + 1 != l.size() ) { i++; continue; }
 					return *this;
 				}
-				if ( x.high() < r.low() )
-					i++;
+				if ( x.high() < r.low() ) i++;
+				else break;
 			}
 			return *this;
 		}
-		vector<CRange> getList () const
-		{
-			return l;
-		}
-		bool operator == ( const CRangeList & list ) const
-		{
-			return ( l == list.getList() );
-		}
-		bool operator != ( const CRangeList & list ) const
-		{
-			return ( l != list.getList() );
-		}
+		vector<CRange> getList () const { return l; }
+		bool operator == ( const CRangeList & list ) const { return ( l == list.getList() ); }
+		bool operator != ( const CRangeList & list ) const { return ( l != list.getList() ); }
 		friend ostream& operator<<(ostream & os, const CRangeList & t);
 	private:
 		vector<CRange> l;
@@ -237,18 +166,18 @@ ostream & operator<< (ostream& os, const CRangeList & t)
     return os;
 }
 
-CRangeList & operator + ( const CRange & r1, const CRange & r2 )
+CRangeList operator + ( const CRange & r1, const CRange & r2 )
 {
-	CRangeList * list = new CRangeList ( r1 );
-	*list += r2;
-	return *list;
+	CRangeList list( r1 );
+	list += r2;
+	return list;
 }
 
-CRangeList & operator - ( const CRange & r1, const CRange & r2 )
+CRangeList operator - ( const CRange & r1, const CRange & r2 )
 {
-	CRangeList * list = new CRangeList ( r1 );
-	*list -= r2;
-	return *list;
+	CRangeList list ( r1 );
+	list -= r2;
+	return list;
 }
 
 
@@ -262,7 +191,7 @@ string toString ( const CRangeList& x )
 
 int main ( void )
 {
-CRangeList a, b;
+CRangeList a, b, c;
 
 assert ( sizeof ( CRange ) <= 2 * sizeof ( long long ) );
 a = CRange ( 5, 10 );
@@ -328,6 +257,9 @@ b += CRange ( 0, 100 ) + CRange ( 200, 300 ) - CRange ( 150, 250 ) + CRange ( 16
 assert ( toString ( b ) == "{<0..100>,<160..169>,<171..180>,<251..300>}" );
 b -= CRange ( 10, 90 ) - CRange ( 20, 30 ) - CRange ( 40, 50 ) - CRange ( 60, 90 ) + CRange ( 70, 80 );
 assert ( toString ( b ) == "{<0..9>,<20..30>,<40..50>,<60..69>,<81..100>,<160..169>,<171..180>,<251..300>}" );
+c = CRange ( LLONG_MIN, LLONG_MAX );
+c -= CRange ( LLONG_MIN + 1, LLONG_MAX );
+assert ( toString ( c ) == "{-9223372036854775808}" );
 /*#ifdef EXTENDED_SYNTAX
 CRangeList x { { 5, 20 }, { 150, 200 }, { -9, 12 }, { 48, 93 } };
 assert ( toString ( x ) == "{<-9..20>,<48..93>,<150..200>}" );

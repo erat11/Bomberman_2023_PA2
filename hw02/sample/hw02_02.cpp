@@ -46,6 +46,167 @@ class Name
 		}
 };
 
+
+class Person2
+{
+	public:
+		Person2 () {}
+		Person2 ( Name wholeName, string email )
+		{
+			this->wholeName.s = wholeName.s;
+			this->wholeName.n = wholeName.n;
+			this->email= email;
+		}
+		Name wholeName;
+		string email;
+};
+
+struct Node 
+{
+	unsigned int amount;
+	Person2 p;
+	Node * left;
+	Node * right;
+};
+
+class Map 
+{
+	public:
+		Node * root;
+		Map( ) 
+		{
+			root = nullptr;
+		}
+
+		~Map( ) 
+		{
+			clear ( root );
+		}
+
+		Node * addNode ( Node * root, Person2 p, unsigned int salary ) 
+		{
+			return insert ( root, p, salary );
+		}
+
+		int get ( string email ) const
+		{
+			Node * node = getHelper ( root, email );
+			if ( node != nullptr ) return node->amount;
+			return -1;
+		}
+
+		Name getName ( string email ) const
+		{
+			Node * node = getHelper ( root, email );
+			if ( node != nullptr ) return node->p.wholeName;
+			return Name ( "NUL", "EROR" );
+		}
+
+		Node * remove ( string p ) 
+		{
+			return removeNode  ( root, p );
+		}
+
+		void print() const
+		{
+			printer ( root );
+		}
+
+		void clear() 
+		{
+			clear ( root );
+			root = nullptr;
+		}
+		Node * getRoot ( )
+		{
+			return root;
+		}
+
+	private:
+		Node * insert ( Node * node, const Person2 & p, unsigned int salary )
+		{
+			if ( node == nullptr ) 
+			{
+				node = new Node();
+				node->p = p;
+				node->amount = salary;
+				node->left = nullptr;
+				node->right = nullptr;
+				return node;
+			}
+			if ( p.email < node->p.email) node->left = insert ( node->left, p, salary );
+			else if ( p.email > node->p.email ) node->right = insert ( node->right, p, salary );
+			else node->amount = salary;
+			return node;
+		}
+
+		Node * getHelper ( Node * node, string email ) const
+		{
+			if ( node == nullptr ) return nullptr;
+			if ( email < node->p.email ) return getHelper ( node->left, email );
+			else if ( email > node->p.email ) return getHelper ( node->right, email );
+			else return node;
+			
+		}
+
+		Node * removeNode ( Node * node, string email ) 
+		{
+			if ( node == nullptr ) return nullptr;
+
+			if ( email < node->p.email ) node->left = removeNode ( node->left, email );
+			else if ( email > node->p.email ) node->right = removeNode (node->right, email );
+			else 
+			{
+				if ( node->left == nullptr ) 
+				{
+				    Node * tmp = node->right;
+				    delete node;
+				    return tmp;
+				} 
+				else if (node->right == nullptr) 
+				{
+				    Node * tmp = node->left;
+				    delete node;
+				    return tmp;
+				}
+
+				Node* tmp = minValueNode ( node->right );
+				node->p = tmp->p;
+				node->amount = tmp->amount;
+				node->right = removeNode ( node->right, email );
+			}
+
+			return node;
+		}
+
+		Node * minValueNode ( Node * node ) 
+		{
+			Node * current = node;
+			while (current->left != nullptr) current = current->left;
+			return current;
+		}
+
+		void printer ( Node * node ) const
+		{
+			if ( node != nullptr ) 
+			{
+				printer ( node->left );
+				cout << node->p.wholeName.n << " " << node->p.wholeName.s << " " << node->p.email << ": " << node->amount << endl;
+				printer ( node->right );
+			}
+		}
+
+		void clear( Node* node ) 
+		{
+			if ( node != nullptr ) 
+			{
+				clear ( node->left );
+				clear ( node->right );
+				delete node;
+			}
+		}
+};
+
 class Person
 {
 	public:
@@ -66,94 +227,101 @@ class CPersonalAgenda
 			for ( auto & x : nameSort )
 				if ( wholeName == x.wholeName || x.email == email ) return false;
 			Person p ( wholeName, email, salary );
+			Person2 p2 ( wholeName, email );
 			push ( p );
+			emailTree.root = emailTree.addNode ( emailTree.root, p2, salary );
 			size++;
 			return true;
 		}
 		bool del ( const string & name, const string & surname )
 		{
-			if ( size == 1 ) { emailSort.clear(); nameSort.clear(); size = 0; return true; }
-			int pos = binSearch ( nameSort, Person ( Name ( name, surname ), "email", 100 ), true );
+			if ( size == 1 ) { emailTree.clear(); nameSort.clear(); size = 0; return true; }
+			int pos = binSearch ( nameSort, Name ( name, surname ) );
 			if ( pos == -1 ) return false;
 			string e = nameSort[pos].email;
 			nameSort.erase( nameSort.begin() + pos );
-			int pos2 = binSearch ( emailSort, Person ( Name ( "hue", "jazz" ), e, 100 ), false );
-			emailSort.erase( emailSort.begin() + pos2 );
+			emailTree.root = emailTree.remove( e );
 			size--;
 			return true;
 		}
 		bool del ( const string & email )
 		{
-			if ( size == 1 ) { emailSort.clear(); nameSort.clear(); size = 0; return true; }
-			int pos = binSearch ( emailSort, Person ( Name ( "hue", "jazz" ), email, 100 ), false );
-			if ( pos == -1 ) return false;
-			Name n = emailSort[pos].wholeName;
-			emailSort.erase( emailSort.begin() + pos );
-			int pos2 = binSearch ( nameSort, Person ( n, "e", 100 ), true );
-			nameSort.erase( nameSort.begin() + pos2 );
+			if ( size == 1 ) { emailTree.clear(); nameSort.clear(); size = 0; return true; }
+			if ( emailTree.get ( email ) == -1 ) return false;
+			emailTree.root = emailTree.remove( email );
+			for ( int i = 0; i < size; ++i)
+				if ( nameSort[i].email == email )
+				{
+					nameSort.erase( nameSort.begin() + i );
+					break;
+				}
 			size--;
 			return true;
 		}
 		bool changeName ( const string & email, const string & newName, const string & newSurname )
 		{
-			int q = binSearch ( nameSort, Person ( Name ( newName, newSurname ), "email", 100 ), true );
-			int pos = binSearch ( emailSort, Person ( Name ( "hue", "jazz" ), email, 100 ), false );
-			if ( pos == -1 || q != -1 ) return false;
-			string oldName = emailSort[pos].wholeName.n, oldSurname = emailSort[pos].wholeName.s;
-			emailSort[pos].wholeName = Name ( newName, newSurname );
-			int pos2 = binSearch ( nameSort, Person ( Name ( oldName, oldSurname ), email, 100 ), true );
-			nameSort.erase( nameSort.begin() + pos2 );
-			Person p ( Name ( newName, newSurname), email, emailSort[pos].salary );
+			unsigned int salary;
+			int i;
+			if ( emailTree.get ( email ) == -1 || binSearch ( nameSort, Name ( newName, newSurname ) ) != -1 ) return false;
+			for ( i = 0; i < size; ++i )
+				if ( email == nameSort[i].email )
+				{
+					nameSort[i].wholeName.n = newName;
+					nameSort[i].wholeName.s = newSurname;
+					salary = nameSort[i].salary;
+					break;
+				}
+			Person2 p2( Name ( newName, newSurname ), email );
+			emailTree.root = emailTree.remove( email );
+			emailTree.root = emailTree.addNode ( emailTree.root, p2, salary );
+			nameSort.erase( nameSort.begin() + i );
+			Person p ( Name ( newName, newSurname), email, salary );
 			for ( int i = 0; i < size - 1; ++i ) if ( p.wholeName < nameSort[i].wholeName  ) { nameSort.insert( nameSort.begin() + i, p ); break; }
 			return true;
 		}
 		bool changeEmail ( const string & name, const string & surname, const string & newEmail )
 		{
-			if ( binSearch ( emailSort, Person ( Name ( "MY", "GOD" ), newEmail, 666 ), false ) != -1 ) return false;
-			int pos = binSearch ( nameSort, Person ( Name ( name, surname ), "email", 100 ), true );
+			if ( emailTree.get( newEmail ) != -1 ) return false;
+			int pos = binSearch ( nameSort, Name ( name, surname ) );
 			if ( pos == -1 ) return false;
 			string oldEmail = nameSort[pos].email;
 			nameSort[pos].email = newEmail;
-			int pos2 = binSearch ( emailSort, Person ( Name ( "oldName, oldSurnam", "e" ), oldEmail, 100 ), false );
-			emailSort.erase( emailSort.begin() + pos2 );
-			Person p ( Name ( name, surname), newEmail, nameSort[pos].salary );
-			for ( int i = 0; i < size - 1; ++i ) if ( p.email < emailSort[i].email  ) { emailSort.insert( emailSort.begin() + i, p ); break; }
+			emailTree.remove ( oldEmail );
+			Person2 p2 ( Name ( name, surname ), newEmail );
+			emailTree.root = emailTree.addNode ( emailTree.root, p2, nameSort[pos].salary );
 			return true;
 		}
 		bool setSalary ( const string & name, const string & surname, unsigned int salary )
 		{
-			int pos = binSearch ( nameSort, Person ( Name ( name, surname ), "df", 100 ), true );
+			int pos = binSearch ( nameSort, Name ( name, surname ) );
 			if ( pos == -1 ) return false;
 			nameSort[pos].salary = salary;
-			int pos2 = binSearch ( emailSort, Person ( Name ( "dsf", "AAA" ), nameSort[pos].email, 100 ), false );
-			emailSort[pos2].salary = salary;
+			emailTree.root = emailTree.remove( nameSort[pos].email );
+			emailTree.root = emailTree.addNode( emailTree.root, Person2 ( Name ( name, surname ), nameSort[pos].email ), salary );
 			return true;
 		}
 		bool setSalary ( const string & email, unsigned int salary )
 		{
-			int pos = binSearch ( emailSort, Person ( Name ( "hue", "jazz" ), email, 100 ), false );
-			if ( pos == -1 ) return false;
-			emailSort[pos].salary = salary;
-			int pos2 = binSearch ( nameSort, Person ( Name ( emailSort[pos].wholeName.n, emailSort[pos].wholeName.s ), "fsdf", 100 ), true );
-			nameSort[pos2].salary = salary;
-			return true;
+			Name n = emailTree.getName( email );
+			if ( n.n == "NUL" && n.s == "EROR" ) return false;
+			return setSalary ( n.n, n.s, salary );
 		}
 		unsigned int getSalary ( const string & name, const string & surname ) const
 		{	
-			int pos = binSearch ( nameSort, Person ( Name ( name, surname ), "meme", 100 ), true );
+			int pos = binSearch ( nameSort, Name ( name, surname ) );
 			if ( pos == -1 ) return false;
 			return nameSort[pos].salary;
 		}
 		unsigned int getSalary ( const string & email ) const
 		{
-			int pos = binSearch ( emailSort, Person ( Name ( "hue", "jazz" ), email, 100 ), false );
-			if ( pos == -1 ) return false;
-			return emailSort[pos].salary;
+			int salary = emailTree.get ( email );
+			if ( salary == -1 ) return false;
+			return salary;
 		}
 		bool getRank ( const string & name, const string & surname, int & rankMin, int & rankMax ) const
 		{
 			rankMin = 0, rankMax = 0;
-			int pos = binSearch ( nameSort, Person ( Name ( name, surname ), "meme", 100 ), true );
+			int pos = binSearch ( nameSort, Name ( name, surname ) );
 			if ( pos == -1 ) return false;
 			for ( auto & x : nameSort )
 				if ( x.salary < nameSort[pos].salary )
@@ -166,14 +334,13 @@ class CPersonalAgenda
 		bool getRank ( const string & email, int & rankMin, int & rankMax ) const
 		{
 			rankMin = 0, rankMax = 0;
-			int pos = binSearch ( emailSort, Person ( Name ( "hue", "jazz" ), email, 100 ), false );
-			if ( pos == -1 ) return false;
-			for ( auto & x : emailSort )
-				if ( x.salary < emailSort[pos].salary )
+			int salary = emailTree.get ( email );
+			if ( salary == -1 ) return false;
+			for ( auto & x : nameSort )
+				if ( x.salary < abs(salary) )
 					rankMin++;
-				else if ( x.salary == emailSort[pos].salary && x.email != emailSort[pos].email )
+				else if ( x.salary == abs(salary) && x.email != email )
 					rankMax ++;
-				
 			rankMax += rankMin;
 			return true;
 		}
@@ -186,7 +353,7 @@ class CPersonalAgenda
 		}
 		bool getNext ( const string & name, const string & surname, string & outName, string & outSurname ) const
 		{
-			int pos = binSearch ( nameSort, Person ( Name ( name, surname ), "huejazz@lol.troll", 100 ), true );
+			int pos = binSearch ( nameSort, Name ( name, surname ) );
 			if ( pos == -1 || pos + 1 == size ) return false;
 			outName = nameSort[pos+1].wholeName.n;
 			outSurname = nameSort[pos+1].wholeName.s;
@@ -196,42 +363,30 @@ class CPersonalAgenda
 		{
 			for ( auto & x : nameSort ) cout << x.wholeName.s << " " << x.wholeName.n << " " << x.email << " " << x.salary << endl;
 			cout << endl;
-			for ( auto & x : emailSort ) cout << x.wholeName.s << " " << x.wholeName.n << " " << x.email << " " << x.salary << endl;
-			cout << endl;
+			emailTree.print();
 		}
 	private:
-		vector<Person> nameSort, emailSort;
+		vector<Person> nameSort;
 		int size;
+		Map emailTree;
 		void push ( const Person p )
 		{
-			bool n = false, e = false;
-			auto iten = nameSort.begin(), itee = emailSort.begin();
-			for ( int i = 0; i < size; ++i )
-			{
-				if ( p.wholeName < nameSort[i].wholeName && !n ) { nameSort.insert( iten + i, p ); n = true; }
-				if ( p.email < emailSort[i].email && !e ) { emailSort.insert( itee + i, p ); e = true; }
-			}
-			if ( ! n ) nameSort.push_back( p );
-			if ( ! e ) emailSort.push_back( p );
+			int i;
+			for ( i = 0; i < size; ++i )
+				if ( p.wholeName < nameSort[i].wholeName ) { nameSort.insert( nameSort.begin() + i, p ); break; }
+			
+			if ( i == size ) nameSort.push_back( p );
 		}
-		int binSearch ( const vector<Person> v, const Person p, const bool name ) const
+		int binSearch ( const vector<Person> v, const Name & p ) const
 		{
 			size_t h = size, l = 0;
 			while ( h > l )
 			{
 				size_t mid = l + ( h - l ) / 2;
-				if ( name )
-				{
-					if ( p.wholeName == v[mid].wholeName ) return mid;
-					if ( p.wholeName > v[mid].wholeName ) l = mid + 1;
-					else h = mid;
-				}
-				else
-				{
-					if ( p.email == v[mid].email ) return mid;
-					if ( p.email > v[mid].email ) l = mid + 1;
-					else h = mid;
-				}
+				if ( p == v[mid].wholeName ) return mid;
+				if ( p > v[mid].wholeName ) l = mid + 1;
+				else h = mid;
+				
 			}
 			return -1;
 		}
