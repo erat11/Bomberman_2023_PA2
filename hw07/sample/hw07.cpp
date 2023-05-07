@@ -26,31 +26,6 @@
 using namespace std;
 #endif /* __PROGTEST__ */
 
-/*list<CInvoice> unmatched ( const string & company, const CSortOpt & sortBy ) const
-    {
-      auto myComparisonFunction = [this, sortBy](const CInvoice &a, const CInvoice &b ) 
-      {
-        for ( const auto & x : sortBy.getKey()) 
-        {
-          int q = compareBy( a, b, x );
-          if ( q < 0 ) return true;
-          if ( q > 0 ) return false;
-        }
-        if ( a.order() < b.order() ) return true;
-        return false;
-      };
-      set<CInvoice, decltype(myComparisonFunction)> ret(myComparisonFunction);
-      string standComp = standardize ( company );
-      for ( const auto & x : invoices ) if ( ( x.first.buyerF() == standComp || x.first.sellerF() == standComp ) && x.second != 2 )
-        ret.emplace ( x.first );
-      return list<CInvoice> ( ret.begin(), ret.end() );
-    }*/
-
-/*tento typ popisuje výsledek zápasu. Pro datový typ M_ je garantováno, že je přesouvatelný,
- kopírovatelný a zrušitelný (CopyConstructibe, MoveConstructible, CopyAssignable, MoveAssignable
-  a Destructible). Další vlastnosti typu nejsou garantované, speciálně, není garantované, že typ
-   M_ má implicitní konstruktor (nemusí být DefaultConstructible). */
-
 template <typename M_>
 class CContest
 {
@@ -59,6 +34,12 @@ class CContest
     {
       public:
         Result ( const string & a, const string & b, const M_ & r ) : a ( a ), b ( b ), r ( r ) {}
+        bool operator < ( const Result & x ) const
+        {
+          if ( a < x.a ) return true;
+          if ( a == x.a && b < x.b ) return true;
+          return false;
+        }
         bool operator == ( const Result & x ) const
         {
           return ( a == x.a && b == x.b ) || ( a == x.b && b == x.a );
@@ -68,43 +49,103 @@ class CContest
     };
     CContest () {}
     ~CContest () {}
+    bool contains ( const Result & x )
+    {
+      for ( const auto & y : storage )
+        if ( x == y ) return true;
+      return false;
+    }
     CContest & addMatch ( const string & contestant1, const string & contestant2, const M_ & result )
     {
-      Result a ( contestant1, contestant2, result );
-      for ( const auto & x : storage ) if ( x == a ) throw logic_error("result match");
-      storage.push_back ( a );
+      Result d ( contestant1, contestant2, result );
+      if ( contains( d ) ) throw logic_error("result match");
+      teams.insert( contestant1 );
+      teams.insert( contestant2 );
+      storage.push_back( d );
       return *this;
     }
-    bool isOrdered ( bool (*comparator)(M_, M_) )
+    template <typename Comparator>
+    void bfs( const string & s, Comparator comparator, map<string,set<string>> & tmpMap, unordered_map<string, bool> & visited ) const
     {
-      set<M_> visited;
-      queue<M_> q;
-      q.push(results[0].r);
-      visited.insert(results[0].r);
-      while ( !q.empty() ) 
+      visited[s] = true;
+      for ( auto x : tmpMap[s] ) 
       {
-        M_ current = q.front();
-        q.pop();
-        // Find all Result objects that have the current M_ object
-        vector<Result> currentResults;
-        for (const Result & result : results)  
-            if (result.r == current) currentResults.push_back(result);
-        // Check if the M_ objects in the currentResult vector are ordered based on the provided comparator
-        for (size_t i = 0; i < currentResults.size() - 1; i++) 
-            if (!comparator(currentResults[i].r, currentResults[i+1].r)) return false;
-        // Add all unvisited M_ objects to the queue and mark them as visited
-        for (const Result& result : currentResults) 
-          if (visited.find(result.r) == visited.end()) 
-          {
-              q.push(result.r);
-              visited.insert(result.r);
-          }
-        return true; // the vector is sortable
+        if ( !visited[x] ) bfs ( x, comparator, tmpMap, visited );
+        tmpMap[s].insert( tmpMap[x].begin(), tmpMap[x].end() );
       }
     }
-    // results ( comparator )
+    template <typename Comparator>
+    bool isOrderedWrapper ( Comparator comparator, map<string,set<string>> & tmpMap, unordered_map<string, bool> & visited, unsigned int & max ) const
+    {
+      if ( !storage.size() ) return true;
+      for ( const auto &x : storage ) 
+      {
+        if ( comparator(x.r) > 0 ) tmpMap[x.a].insert(x.b);
+        else if ( comparator( x.r ) < 0 ) tmpMap[x.b].insert( x.a );
+      }
+      for ( const auto & x : teams ) if ( !visited[x] ) bfs( x, comparator, tmpMap, visited );
+      max = 0;
+      for ( const auto & x : tmpMap )
+      {
+        if ( x.second.find(x.first) != x.second.end() ) return false;
+        for ( const auto & y : tmpMap )
+          if ( x.second == y.second && x.first != y.first ) return false;
+        if ( max < x.second.size() ) max = x.second.size();
+      }
+      /*for ( auto & x : tmpMap )
+        for ( auto & y : x.second )
+          cout << x.first << " -> " << y << endl;
+      cout << endl;*/
+      return true;
+    }
+
+    template <typename Comparator>
+    bool isOrdered ( Comparator comparator ) const
+    {
+      unsigned int max = 0;
+      map<string,set<string>> tmpMap;
+      unordered_map<string, bool> visited;
+      return isOrderedWrapper( comparator, tmpMap, visited, max );
+    }
+    template <typename Comparator>
+    list<string> topSort( Comparator comparator ) const
+    {
+      unsigned int max = 0;
+      map<string,set<string>> tmpMap;
+      unordered_map<string, bool> visited;
+      if ( !isOrderedWrapper( comparator, tmpMap, visited, max ) ) throw logic_error("results are not ordered!");
+
+
+      queue<string> q;
+      unordered_map<string, int> inDegrees;
+      for (const auto & x : tmpMap) 
+      {
+        inDegrees[x.first] = x.second.size();
+        if ( max == x.second.size() ) q.push( x.first );
+      }
+      list<string> sorted;
+      while ( !q.empty() )
+      {
+        string front = q.front();
+        q.pop();
+        sorted.push_back( front );
+
+        vector<pair<string, int>> v;
+        for ( const auto & y : tmpMap[front] ) v.push_back( make_pair( y, inDegrees[y] ) );
+        stable_sort(v.begin(), v.end(), [](const auto& a, const auto& b) { return a.second > b.second; });
+        for ( const auto & y : v )  { if ( inDegrees[y.first] != -1 ) { q.push( y.first ); inDegrees[y.first] = -1; } }
+      }
+      return sorted;
+    }
+    template <typename Comparator>
+    list<string> results ( Comparator comparator ) const
+    {
+      return topSort( comparator );
+    }
   private:
     vector<Result> storage;
+    set<string> teams;
+    unsigned int max;
 };
 
 #ifndef __PROGTEST__
@@ -145,7 +186,7 @@ int main ( void )
     . addMatch ( "PHP", "Basic", CMatch ( 10, 0 ) );
     
   
-  /*assert ( ! x . isOrdered ( HigherScore ) );
+  assert ( ! x . isOrdered ( HigherScore ) );
   try
   {
     list<string> res = x . results ( HigherScore );
@@ -274,7 +315,7 @@ int main ( void )
   catch ( ... )
   {
     assert ( "Invalid exception thrown!" == nullptr );
-  }*/
+  }
   return EXIT_SUCCESS;
 }
 #endif /* __PROGTEST__ */
