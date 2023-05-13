@@ -1,12 +1,11 @@
-#include <string>
+#include <fstream>
+#include "Interface.h"
 
-using namespace std;
+Interface::Interface () {}
 
-class Interface
+Interface::Interface ( const char * configFile )
 {
-	private:
-		int width, heigth;
-		bool visibility;
-		string caption;
-		//backgroud color, font size ...
-};
+	ofstream file ( configFile );
+	cout << "interface\n";
+	file.close();
+}

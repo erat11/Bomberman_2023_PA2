@@ -1,38 +1,18 @@
-#include <vector>
-#include <SDL2/SDL.h>
-#include "Baloon.cpp"
-#include "BotPlayer.cpp"
-#include "KeyboardPlayer.cpp"
-#include "DestructiveBomb.cpp"
-#include "HolyGranadeBomb.cpp"
-#include "GameMap.cpp"
-#include "OptionsTable.cpp"
-#include "ScoreTable.cpp"
-#include "StartScreen.cpp"
-#include "AllWallPassBuff.cpp"
-#include "SpeedUpgradeBuff.cpp"
-#include "SpeedDowngradeBuff.cpp"
-#include "CanPassObjectsBuff.cpp"
-#include "ImmortalityBuff.cpp"
-#include "Wall.cpp"
+#define CONFIG_START_SCREEN "./config/startScreen.ini"
+#include "StartScreen.h"
+#include "Game.h"
 
-class Game
+using namespace std;
+
+Game::Game ()
 {
-	public:
-		Game ()
-		{
+	Run();
+}
 
-		}
+void Game::Run ()
+{
+	cout << "game\n";
+	screen = StartScreen( CONFIG_START_SCREEN );
+}
 
-
-
-		~Game ()
-		{
-
-		}
-	private:
-		vector<Player *> players;
-		vector<Bomb *> players;
-		Interface * currentScreen;
-
-};
+Game::~Game () {}

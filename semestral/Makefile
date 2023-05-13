@@ -1,25 +1,21 @@
-CXX = g++
-CXXFLAGS = -std=c++11 -Wall -Wextra -pedantic
+CXXFLAGS = -Wall -Wextra -std=c++11
 
-SRC = src/main.cpp
-OBJ = $(SRC:.cpp=.o)
-EXEC = gameExecutable
+# Define the SFML libraries to link against
+LDFLAGS=-fsanitize=address
 
-SDL_LIB = -lSDL2
-SDL_INCLUDE = -I/usr/include/SDL2
+# Define the source files and the output executable
+SRCS = src/main.cpp src/Game.cpp src/StartScreen.cpp src/Interface.cpp src/GameObject.cpp src/Moveset.cpp src/Buff.cpp
+OBJS = $(SRCS:.cpp=.o)
+EXEC = game
 
-# Build target
-all: $(EXEC)
+# Compile and link the program
+$(EXEC): $(OBJS)
+	$(CXX) $(CXXFLAGS) $(OBJS) $(LDFLAGS) -o $(EXEC)
 
-# Link object files to create the executable
-$(EXEC): $(OBJ)
-	$(CXX) $(CXXFLAGS) $(OBJ) -o $(EXEC) $(SDL_LIB)
-
-# Compile each source file into an object file
+# Compile the source files
 %.o: %.cpp
-	$(CXX) $(CXXFLAGS) $(SDL_INCLUDE) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Clean up object files and executable
+# Clean up the object files and the executable
 clean:
-	rm -f $(OBJ) $(EXEC)
-	rm -f src/*.o
+	rm -f $(OBJS) $(EXEC)

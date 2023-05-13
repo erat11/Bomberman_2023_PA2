@@ -1,6 +1,5 @@
-#include "GameObject.cpp"
 #include "Bomb.cpp"
-#include "Buff.cpp"
+#include "Buff.h"
 #include <queue>
 #include <set>
 
@@ -14,5 +13,6 @@ class Player : public GameObject
 		int speed, lives;
 		queue<Bomb> bombs;
 		set<Buff> buffs;
+		Moveset move;
 		//virtual moveset for keyboard, online and AI players
 };

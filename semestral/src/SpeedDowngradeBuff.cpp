@@ -1,4 +1,4 @@
-#include "Buff.cpp"
+#include "Buff.h"
 
 class SpeedDowngradeBuff : public Buff
 {
