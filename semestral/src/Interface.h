@@ -3,6 +3,8 @@
 
 #include <string>
 #include <iostream>
+#include <ncurses.h>
+#include <vector>
 
 using namespace std;
 
@@ -10,12 +12,25 @@ class Interface
 {
 	public:
 		Interface ();
-		Interface ( const char * configFile );
+		Interface ( const string & s );
+		virtual void print();
+	    virtual void handleInput();
+	    ~Interface ();
 	protected:
-		int width, heigth;
-		bool visibility;
-		string caption;
-		//backgroud color, font size ...
+		class BoxPosition
+		{
+			public:
+				BoxPosition ( int a, int b, int c, int d, const string & s ) : 
+				topLeftX ( a ), topLeftY ( b ), bottomRightX ( c ), 
+				bottomRightY ( d ), jumpTo ( s ) {} 
+				int topLeftX, topLeftY, bottomRightX, bottomRightY;
+				string jumpTo;
+		};
+		string backgroundColour, fontColour, caption;
+		int writeX, writeY, maxX, maxY;
+		vector<BoxPosition> clickBoxPos;
+
+		void boxPrint ( const char * s );
 };
 
 #endif

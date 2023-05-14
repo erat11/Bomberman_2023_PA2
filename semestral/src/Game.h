@@ -2,7 +2,10 @@
 #define GAME_H
 
 #include <vector>
-#include "StartScreen.h"
+#include <string>
+#include "StartScreen.cpp"
+#include "GetNameScreen.cpp"
+#include "Player.cpp"
 
 class Game
 {
@@ -10,9 +13,11 @@ public:
     Game();
     void Run();
     ~Game();
-
 private:
-    StartScreen screen;
+    void StartGame();
+    int GameLoop( bool p );
+    Player player1, player2;
+
 };
 
 #endif
