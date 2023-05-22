@@ -1,10 +1,15 @@
 #ifndef INTERFACE_H
 #define INTERFACE_H
+#include <cstring>
 
 #include <string>
 #include <iostream>
 #include <ncurses.h>
 #include <vector>
+#include <fstream>
+#include <sys/ioctl.h>
+#include <unistd.h>
+#include <regex>
 
 using namespace std;
 
@@ -20,17 +25,21 @@ class Interface
 		class BoxPosition
 		{
 			public:
-				BoxPosition ( int a, int b, int c, int d, const string & s ) : 
+				BoxPosition ( int a, int b, int c, int d, int v, const string & s ) : 
 				topLeftX ( a ), topLeftY ( b ), bottomRightX ( c ), 
-				bottomRightY ( d ), jumpTo ( s ) {} 
-				int topLeftX, topLeftY, bottomRightX, bottomRightY;
+				bottomRightY ( d ), value ( v ), jumpTo ( s ) {} 
+				int topLeftX, topLeftY, bottomRightX, bottomRightY, value;
 				string jumpTo;
 		};
 		string backgroundColour, fontColour, caption;
 		int writeX, writeY, maxX, maxY;
-		vector<BoxPosition> clickBoxPos;
 
-		void boxPrint ( const char * s );
+		void boxPrint ( const char * s, int value );
+		bool isInVector ( const BoxPosition & x );
+
+		void checkSize ();
+		vector <string> boxNames;
+		vector<BoxPosition> clickBoxPos;
 };
 
 #endif

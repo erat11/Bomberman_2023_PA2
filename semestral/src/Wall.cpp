@@ -1,4 +1,4 @@
-#include "GameObject.cpp"
+#include "GameObject.h"
 
 class Wall : public GameObject
 {

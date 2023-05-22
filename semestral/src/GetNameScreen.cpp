@@ -11,13 +11,17 @@ class GetNameScreen : public Interface
 		}
 		void print () override
 		{
+			checkSize();
 			clear();
 			refresh();
 			writeY = ( maxY - caption.size() ) / 2;
 			writeX = 10;
 			mvprintw ( writeX, writeY, caption.c_str() );
 			refresh();
-			writeX += 6;
+			writeX += 12;
+			writeY = ( maxY - 18 ) / 2;
+			mvprintw ( writeX, writeY, "( 1 to 32 letters )" );
+			writeX -= 6;
 			writeY = ( maxY - playerName.size() ) / 2;
 			mvprintw ( writeX, writeY, playerName.c_str() );
 		}

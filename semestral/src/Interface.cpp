@@ -1,30 +1,4 @@
-#include <fstream>
 #include "Interface.h"
-#include <iostream>
-#include <string>
-#include <regex>
-#include <sys/ioctl.h>
-#include <unistd.h>
-
-using namespace std;
-
-/*
-	initscr();
-
-	// set the background color to blue
-	bkgd(COLOR_PAIR(1));
-	start_color();
-	init_pair(1, COLOR_BLUE, COLOR_BLACK);
-
-	// print a message on the blue background
-	printw("Hello, world!");
-
-	refresh();
-	getch();
-
-	endwin();
-	return 0;
-*/
 
 Interface::Interface () {}
 
@@ -35,16 +9,11 @@ Interface::Interface ( const string & caption )
 	noecho();
 	keypad(stdscr, TRUE);
 	mousemask(ALL_MOUSE_EVENTS, NULL);
-
 	this->caption = caption;
 	getmaxyx ( stdscr, maxX, maxY );
 }
 
-void Interface::print() { cout << caption; }
-
-void Interface::handleInput () { getch(); }
-
-void Interface::boxPrint ( const char * s )
+void Interface:: boxPrint ( const char * s, int value )
 {
 	int l = strlen ( s );
 	writeY = ( maxY - l - 4 ) / 2;
@@ -66,7 +35,8 @@ void Interface::boxPrint ( const char * s )
 	mvprintw ( writeX, writeY, s );
 	writeY += l;
 	mvprintw ( writeX, writeY, " |" );
-	writeY += 2;
+	writeY += 3;
+	if ( value != -1 ) mvprintw ( writeX, writeY, to_string(value).c_str() );
 
 	writeX++;
 	writeY = oldY;
@@ -78,7 +48,25 @@ void Interface::boxPrint ( const char * s )
 	writeY = oldY;
 	for ( int i = 0; i < l + 4; ++i ) mvprintw ( writeX, writeY++, "-" );
 
-	clickBoxPos.push_back( BoxPosition ( tlx, tly, writeX, writeY, string ( s ) ) );
+	auto u = BoxPosition ( tlx, tly, writeX, writeY, value, string ( s ) );
+	if ( !isInVector( u ) )
+		clickBoxPos.push_back( BoxPosition ( tlx, tly, writeX, writeY, value, string ( s ) ) );
+}
+
+void Interface::print() { cout << caption; }
+
+bool Interface::isInVector ( const BoxPosition & z )
+{
+	for ( const auto & x : clickBoxPos )
+		if ( z.jumpTo == x.jumpTo ) return true;
+	return false;
+}
+
+void Interface::handleInput () { getch(); }
+
+void Interface::checkSize ()
+{
+	getmaxyx ( stdscr, maxX, maxY );
 }
 
 Interface::~Interface() 
@@ -87,30 +75,3 @@ Interface::~Interface()
 	refresh();
 	endwin();
 }
-
-/*bool Interface::readConfig ( const char * configFile )
-{
-	cout << "interface\n";
-	ifstream file ( configFile );
-	if ( file.is_open () ) 
-	{
-		string line;
-		if ( ! getline ( file, line ) || !checkFormat ( line, "resX=(\\d+)", width ) )  //reading resX
-			cout << "Error reading config file, exiting...\n";
-		if ( ! getline ( file, line ) || !checkFormat ( line, "resY=(\\d+)", height ) )  //reading resY
-			cout << "Error reading config file, exiting...\n";
-		
-		file.close(); // Close file
-	}
-	else cout << "Failed to open config file, exiting...\n";
-	return true;
-}
-
-bool Interface::checkFormat ( const string & s, const char * c, int & value )
-{
-	regex pattern ( c );
-	smatch match;
-	if ( regex_search ( s, match, pattern ) ) value = stoi(match[1].str());
-	else return false;
-	return true;
-}*/

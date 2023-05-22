@@ -3,9 +3,11 @@
 
 #include <vector>
 #include <string>
-#include "StartScreen.cpp"
+#include "StartScreen.h"
 #include "GetNameScreen.cpp"
 #include "Player.cpp"
+#include "GameMap.cpp"
+#include "SettingsScreen.cpp"
 
 class Game
 {
@@ -15,8 +17,9 @@ public:
     ~Game();
 private:
     void StartGame();
-    int GameLoop( bool p );
+    void GameLoop( bool p );
     Player player1, player2;
+    GameMap playMap;
 
 };
 
