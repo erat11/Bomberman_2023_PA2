@@ -4,6 +4,7 @@ Interface::Interface () {}
 
 Interface::Interface ( const string & caption )
 {
+	setlocale(LC_ALL, "");
 	initscr();
 	cbreak();
 	noecho();
@@ -60,6 +61,15 @@ bool Interface::isInVector ( const BoxPosition & z )
 	for ( const auto & x : clickBoxPos )
 		if ( z.jumpTo == x.jumpTo ) return true;
 	return false;
+}
+
+bool Interface::checkFormat ( const string & s, const char * c, int & value )
+{
+	regex pattern ( c );
+	smatch match;
+	if ( regex_search ( s, match, pattern ) ) value = stoi(match[1].str());
+	else return false;
+	return true;
 }
 
 void Interface::handleInput () { getch(); }

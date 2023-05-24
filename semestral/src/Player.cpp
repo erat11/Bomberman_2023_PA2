@@ -1,23 +1,15 @@
-#include "Bomb.cpp"
-#include "Buff.h"
-#include <queue>
-#include <set>
-#include "GameObject.h"
-#include <string>
+#include "Player.h"
 
-class Player : public GameObject
+Player::Player () : GameObject() { }
+Player::Player ( int x, int y, int hp, char r, const string & name ) : GameObject ( hp, r ) 
 {
-	public:
-		Player () : GameObject() 
-		{}
-		Player ( int x, int y, int r, bool v, bool p ) : GameObject ( x, y, r, v, p ) {}
-		void setName ( const string & n ) { name = n; }
-		void initBot () {}
-	private:
-		int speed, lives;
-		//queue<Bomb> bombs;
-		//set<Buff> buffs;
-		//Moveset move;
-		string name;
-		//virtual moveset for keyboard, online and AI players
-};
+	mapPos = make_pair ( x, y );
+	this->name = name;
+	this->hp = hp;
+}
+int    Player::getSpeed () { return speed; }
+int    Player::getHP    () { return hp;    }
+int    Player::getScore () { return score; }
+string Player::getName  () { return name;  }
+void Player::setPos ( int x, int y ) { mapPos = make_pair( x, y ); }
+pair<int, int> Player::getPos () const { return mapPos; }

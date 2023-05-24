@@ -17,8 +17,11 @@ void Game::Run ()
 	if ( stScreen.get() == "Start New Game" ) StartGame();
 	else if ( stScreen.get() == "Settings" ) 
 	{
-		boxNames = { "Settings", "Drop Chance Percent", "Dollar Chance Percent", "Debuffs On/Off", "Baloons On/Off", "HP count", "Choose Map", "Save & Exit", "Reset Default & Exit" };
+		boxNames = { "Settings", "Drop Chance Percent", "Dollar Chance Percent",
+		             "Debuffs On/Off", "Baloons On/Off", "HP count", "Choose Map", "Save & Exit", "Reset Default & Exit" };
 		auto seScreen = SettingsScreen ( boxNames );
+		seScreen.load();
+		seScreen.handleInput();
 		Run();
 	}
 }
@@ -36,16 +39,26 @@ void Game::StartGame()
 
 void Game::GameLoop( bool p )
 {
+	auto seScreen = SettingsScreen ();
+	seScreen.load();
 	auto NameScreen1 = GetNameScreen ( "TYPE NAME FOR PLAYER1" );
-	player1.setName( NameScreen1.get() );
+	playMap = GameMap ( "GAME" );
 	if ( p )
 	{
 		auto NameScreen2 = GetNameScreen ( "TYPE NAME FOR PLAYER2" );
-		player2.setName( NameScreen2.get() );
+		if ( !playMap.load( seScreen.getHP(), NameScreen1.get(), NameScreen2.get() ) ) return;
 	}
-	else player2.initBot();
+	else { if ( !playMap.load( seScreen.getHP(), NameScreen1.get(), "BOT"s ) ) return; }
 	
-	auto playMap = GameMap ( "GAME" );
+	cout << seScreen.getHP() << endl;
+	playMap.addDollars( seScreen.getDollarChance() );
+
+	//loop
+	while ( 1 )
+	{
+		playMap.print();
+		playMap.handleInput();
+	}
 }
 
 Game::~Game () {}

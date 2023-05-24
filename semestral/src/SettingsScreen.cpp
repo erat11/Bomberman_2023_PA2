@@ -7,21 +7,22 @@ class SettingsScreen : public StartScreen
 {
 	public:
 		SettingsScreen () : StartScreen () {}
-		SettingsScreen ( const vector<string> & v ) : StartScreen ( v ) 
-		{ 
-			load();
-			handleInput();
-		}
+		SettingsScreen ( const vector<string> & v ) : StartScreen ( v ) { }
+		int getDropChance() { return dropChance; }
+		int getDollarChance() { return dollarChance; }
+		int getBaloons() { return baloons; }
+		int getDebuffs() { return debuffs; }
+		int getHP() { return hp; }
 		bool load ( )
 		{
 			ifstream file ( PATH_TO_SETTINGS );
 			if ( file.is_open () ) 
 			{
 				string line;
-				if ( ! getline ( file, line ) || !checkFormat ( line, "DROP_CHANCE=(\\d+)", dropChance ) || 
-				     ! getline ( file, line ) || !checkFormat ( line, "DOLLAR_CHANCE=(\\d+)", dollarChance )  ||
-				     ! getline ( file, line ) || !checkFormat ( line, "BALOONS=(\\d+)", baloons ) || 
-				     ! getline ( file, line ) || !checkFormat ( line, "DEBUFFS=(\\d+)", debuffs ) || 
+				if ( ! getline ( file, line ) || !checkFormat ( line, "DROP_CHANCE=(\\d+)", dropChance     ) || 
+				     ! getline ( file, line ) || !checkFormat ( line, "DOLLAR_CHANCE=(\\d+)", dollarChance ) ||
+				     ! getline ( file, line ) || !checkFormat ( line, "BALOONS=(\\d+)", baloons            ) || 
+				     ! getline ( file, line ) || !checkFormat ( line, "DEBUFFS=(\\d+)", debuffs            ) || 
 				     ! getline ( file, line ) || !checkFormat ( line, "HP=(\\d+)", hp ) )
 				{
 					cout << "Error reading config file, exiting...\n" << endl;
@@ -31,14 +32,6 @@ class SettingsScreen : public StartScreen
 				return true;
 			}
 			return false;
-		}
-		bool checkFormat ( const string & s, const char * c, int & value )
-		{
-			regex pattern ( c );
-			smatch match;
-			if ( regex_search ( s, match, pattern ) ) value = stoi(match[1].str());
-			else return false;
-			return true;
 		}
 		void print () override
 		{

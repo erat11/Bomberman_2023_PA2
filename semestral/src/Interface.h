@@ -10,6 +10,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <regex>
+#include <random>
 
 using namespace std;
 
@@ -36,6 +37,7 @@ class Interface
 
 		void boxPrint ( const char * s, int value );
 		bool isInVector ( const BoxPosition & x );
+		bool checkFormat ( const string & s, const char * c, int & value );
 
 		void checkSize ();
 		vector <string> boxNames;

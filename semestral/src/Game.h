@@ -5,8 +5,8 @@
 #include <string>
 #include "StartScreen.h"
 #include "GetNameScreen.cpp"
-#include "Player.cpp"
-#include "GameMap.cpp"
+#include "Player.h"
+#include "GameMap.h"
 #include "SettingsScreen.cpp"
 
 class Game
@@ -18,7 +18,6 @@ public:
 private:
     void StartGame();
     void GameLoop( bool p );
-    Player player1, player2;
     GameMap playMap;
 
 };
