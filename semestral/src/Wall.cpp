@@ -3,7 +3,7 @@
 class Wall : public GameObject
 {
 	public:
-		Wall () : GameObject () {}
+		Wall () : GameObject () { }
 		Wall ( int hp, char r ) : GameObject ( hp, r ) 
 		{
 			if ( r == '|' || r == '-' ) { hp = -1; pernament = 1; visibility = 1; }

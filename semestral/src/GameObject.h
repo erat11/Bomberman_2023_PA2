@@ -13,6 +13,7 @@ class GameObject
 		char getMapRep        () const;
 		void setMapRep  (char c);	
 		int getHP             () const;
+		virtual void mapDestroy ();
 	protected:
 		int hp;
 		char mapRep;

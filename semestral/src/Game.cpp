@@ -50,15 +50,10 @@ void Game::GameLoop( bool p )
 	}
 	else { if ( !playMap.load( seScreen.getHP(), NameScreen1.get(), "BOT"s ) ) return; }
 	
-	cout << seScreen.getHP() << endl;
 	playMap.addDollars( seScreen.getDollarChance() );
 
 	//loop
-	while ( 1 )
-	{
-		playMap.print();
-		playMap.handleInput();
-	}
+	playMap.handleInput();
 }
 
 Game::~Game () {}

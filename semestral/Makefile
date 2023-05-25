@@ -5,7 +5,7 @@ LDFLAGS= -fsanitize=address -lncursesw
 FILES= src/*.cpp
 
 # Define the source files and the output executable
-SRCS = src/main.cpp src/Game.cpp src/StartScreen.cpp src/Interface.cpp src/GameObject.cpp src/Moveset.cpp src/Buff.cpp src/SettingsScreen.cpp src/GameMap.cpp src/Player.cpp src/Wall.cpp src/AI.cpp
+SRCS = src/main.cpp src/Game.cpp src/StartScreen.cpp src/Interface.cpp src/GameObject.cpp src/Buff.cpp src/SettingsScreen.cpp src/GameMap.cpp src/Player.cpp src/Wall.cpp src/AI.cpp src/Bomb.cpp
 OBJS = $(SRCS:.cpp=.o)
 EXEC = game
 

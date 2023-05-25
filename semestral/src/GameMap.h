@@ -22,9 +22,11 @@ class GameMap : public Interface
 		int sizeX, sizeY, startX, startY;
 		vector<vector<GameObject>> gameMap;
 		void mapPrint ();
-		void playerPrint();
+		void playerInfoPrint( const Player & p, int writeX, int writeY );
 		void printHearts ( int wx, int wy, int hp );
-		void swapper ( int a, int b, int c, int d, bool player );
+		void swapper ( int a, int b, int c, int d, Player & p );
+		void handlePlayer ( char x, Player & player );
+		void handleBombPlacement ( Player & player );
 		Player player1, player2;
 		AI bot;
 };

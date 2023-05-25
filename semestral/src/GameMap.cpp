@@ -4,6 +4,7 @@ GameMap::GameMap () : Interface () {}
 
 GameMap::GameMap ( const char * caption ) : Interface ( caption )
 {
+
 }
 
 bool GameMap::load ( int hp, const string & s1, const string & s2 )
@@ -36,11 +37,12 @@ bool GameMap::load ( int hp, const string & s1, const string & s2 )
 		file.close();
 		//todo verify map integrity
 		player1 = Player ( 1, 1, hp, 'P', s1 );
+		player1.setMoveset( 'w', 's', 'a', 'd', ' ' );
 		if ( s2 == "BOT" ) player2 = AI ( sizeX - 2, sizeY - 2, hp, 'Q', s2 );
 		else player2 = Player ( sizeX - 2, sizeY - 2, hp, 'Q', s2 );
+		player2.setMoveset( '8', '5', '4', '6', '+' );
 		gameMap[1][1] = player1;
 		gameMap[sizeX - 2][sizeY - 2] = player2;
-		cbreak();
 		nodelay(stdscr, true);
 		return true;
 	}
@@ -60,14 +62,11 @@ void GameMap::addDollars ( int chance )
 
 void GameMap::print ()
 {
-	checkSize();
 	clear();
-	
 	mapPrint();
-	playerPrint();
-
+	playerInfoPrint( player1, 10, ( maxY - sizeY ) / 10);
+	playerInfoPrint( player2, maxX - 10, ( ( maxY ) / 10 ) * 8 );
 	refresh();
-	getch();
 }
 
 int GameMap::getSizeX() { return sizeX; }
@@ -88,31 +87,33 @@ void GameMap::mapPrint ()
 	} 
 }
 
-void GameMap::playerPrint( )
+void GameMap::playerInfoPrint( const Player & p, int writeX, int writeY )
 {
-	writeX = 10;
-	writeY = ( maxY - sizeY ) / 10;
-	mvprintw( writeX, writeY, "Player1: (" );
-	writeY += 10;
-	mvprintw( writeX, writeY++, "%c", player1.getMapRep() );
+	int wY = writeY;
+	mvprintw( writeX, writeY, "Player: (" );
+	writeY += 9;
+	mvprintw( writeX, writeY++, "%c", p.getMapRep() );
 	mvprintw( writeX++, writeY, ") " );
-	writeY = ( maxY - sizeY ) / 10;
-	mvprintw( writeX, writeY, player1.getName().c_str() );
-	writeY += player1.getName().size() + 2;
-	printHearts ( writeX, writeY, player1.getHP() );
-	//todo bombstack
-	//todo score
-
-	writeX = maxX - 10;
-	writeY = ( ( maxY ) / 10 ) * 8;
-	mvprintw( writeX, writeY, "Player2: (" );
+	writeY = wY;
+	mvprintw( writeX, writeY, p.getName().c_str() );
+	writeY += p.getName().size() + 2;
+	printHearts ( writeX, writeY, p.getHP() );
+	writeY = wY;
+	writeX++;
+	mvprintw( writeX, writeY, "Bombstack " );
 	writeY += 10;
-	mvprintw( writeX, writeY++, "%c", player2.getMapRep() );
-	mvprintw( writeX++, writeY, ") " );
-	writeY = ( ( maxY ) / 10 ) * 8;
-	mvprintw( writeX, writeY, player2.getName().c_str() );
-	writeY += player2.getName().size() + 2;
-	printHearts ( writeX, writeY, player2.getHP() );
+	queue<Bomb> stackTmp = p.getBombStack();
+	while ( !stackTmp.empty() )
+	{
+		mvprintw( writeX, writeY, "%c ", stackTmp.front().getMapRep() );
+		stackTmp.pop();
+		writeY += 2;
+	}
+	writeY = wY;
+	writeX++;
+	mvprintw( writeX, writeY, "Score: " );
+	writeY += 10;
+	mvprintw( writeX, writeY, "%d", p.getScore() );
 }
 
 void GameMap::printHearts ( int wx, int wy, int hp )
@@ -127,35 +128,37 @@ void GameMap::printHearts ( int wx, int wy, int hp )
 
 void GameMap::handleInput () 
 {
-	char key = getch();
-
-    // Check if 'a', 'w', 's', or 'd' were pressed
-    int i = player1.getPos().first, j = player1.getPos().second;
-    if ( key == 'a' && !gameMap[i][j - 1].getHP() )
-    {
-    	player1.setPos( i, j - 1 );
-    	swapper ( i, j, i, j - 1, 1 );
-    }
-    if ( key == 'd' && !gameMap[i][j + 1].getHP() )
-    {
-    	player1.setPos( i, j + 1 );
-    	swapper ( i, j, i, j + 1, 1 );
-    }
-    if ( key == 's' && !gameMap[i + 1][j].getHP() )
-    {
-    	player1.setPos( i + 1, j );
-    	swapper ( i + 1, j, i, j, 1 );
-    }
-    if ( key == 'w' && !gameMap[i - 1][j].getHP() )
-    {
-    	player1.setPos( i - 1, j );
-    	swapper ( i - 1, j, i, j, 1 );
-    }
+	char key = '!';
+	while ( 1 )
+	{
+		print();
+		key = getch();
+		if ( player1.hasInMoveset( key ) )                   handlePlayer ( key, player1 );
+		else if ( player2.hasInMoveset( key ) && !player2.bot() ) handlePlayer ( key, player2 );
+		print();
+		if ( key == '\n' ) break;
+	}
 }
 
-void GameMap::swapper ( int a, int b, int c, int d, bool player )
+void GameMap::swapper ( int a, int b, int c, int d, Player & player )
 {
-	if ( player ) gameMap[a][b] = player1;
-	else 	      gameMap[a][b] = player2;
-	gameMap[c][d] = Wall ( Wall ( 0, ' ' ) );
+	player.setPos( c, d );
+	gameMap[c][d] = player;
+	gameMap[a][b] = Wall ( Wall ( 0, ' ' ) );
 }
+
+void GameMap::handlePlayer ( char key, Player & player )
+{
+	int i = player.getPos().first, j = player.getPos().second;
+	if      ( player.getMoveset().left() == key  && gameMap[i][j - 1].getMapRep() == ' ' ) swapper ( i, j, i, j - 1, player );
+	else if ( player.getMoveset().right() == key && gameMap[i][j + 1].getMapRep() == ' ' ) swapper ( i, j, i, j + 1, player );
+	else if ( player.getMoveset().down() == key  && gameMap[i + 1][j].getMapRep() == ' ' ) swapper ( i, j, i + 1, j, player );
+	else if ( player.getMoveset().up() == key    && gameMap[i - 1][j].getMapRep() == ' ' ) swapper ( i, j, i - 1, j, player );
+	else if ( player.getMoveset().bomb() == key ) handleBombPlacement( player );
+}
+
+void GameMap::handleBombPlacement ( Player & player )
+{
+	
+}
+
