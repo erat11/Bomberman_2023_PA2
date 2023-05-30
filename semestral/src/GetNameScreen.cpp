@@ -34,7 +34,7 @@ class GetNameScreen : public Interface
 				print();
 				ch = getch();
 				print();
-				if ( ( ch == '\n' && playerName.size() != 0 ) || playerName.size() > 32 ) break;
+				if ( ( ch == '\n' && playerName.size() != 0 ) || playerName.size() > 16 ) break;
 				if ( ch == '\n' && playerName.size() == 0 ) continue;
 				playerName += ch;
 			}

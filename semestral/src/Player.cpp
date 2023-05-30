@@ -3,12 +3,22 @@
 Player::Player () : GameObject() { }
 Player::Player ( int x, int y, int hp, char r, const string & name ) : GameObject ( hp, r ) 
 {
+	type = 2;
 	mapPos = make_pair ( x, y );
 	this->name = name;
 	this->hp = hp;
 	isBot = false;
 	initBombStack();
 	score = 0;
+}
+Player::~Player ()
+{
+	while ( ! bombs.empty() )
+	{
+		auto b = bombs.front();
+		delete b;
+		bombs.pop();
+	}
 }
 /*Player::Player ( const Player & p )
 {
@@ -41,16 +51,40 @@ bool Player::bot() const { return isBot; }
 void Player::setMoveset( char a, char b, char c, char d, char e ) { move = Moveset ( a, b, c, d, e ); }
 bool Player::hasInMoveset ( char k ) { return move.contain( k ); }
 Moveset Player::getMoveset () const { return move; }
-queue<Bomb> Player::getBombStack() const { return bombs; }
+queue<Bomb*> Player::getBombStack() const { return bombs; }
 
-void Player::PlaceBomb()
+void Player::placeBomb( vector<vector<GameObject*>> & gameMap )
 {
+	Bomb * b = bombs.front();
+	auto x = getDirectedPos();
+	if ( gameMap[x.first][x.second]->getMapRep() == ' ' )
+	{
+		delete gameMap[x.first][x.second];
+		gameMap[x.first][x.second] = b;
+	}
+	b->setPos( getDirectedPos().first, getDirectedPos().second );
+	b->lightBomb();
+
 	bombs.pop();
-	bombs.push ( Bomb () );
+	bombs.push ( new Bomb () );
 }
 
 void Player::initBombStack ()
 {
 	for ( int i = 0; i < 5; ++i )
-		bombs.push ( Bomb () );
+		bombs.push ( new Bomb () );
 }
+
+pair<int, int> Player::getDirectedPos() const
+{
+	switch( move.direction() )
+	{
+		case( 0 ): return make_pair( mapPos.first - 1, mapPos.second );
+		case( 1 ): return make_pair( mapPos.first + 1, mapPos.second );
+		case( 2 ): return make_pair( mapPos.first, mapPos.second - 1 );
+		default: return make_pair( mapPos.first, mapPos.second + 1 );
+	}
+}
+
+void Player::setHP ( int nhp ) { hp = nhp; }
+

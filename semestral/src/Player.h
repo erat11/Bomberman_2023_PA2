@@ -45,12 +45,13 @@ class Player : public GameObject
 	public:
 		Player ();
 		Player ( int x, int y, int hp, char r,  const string & name ); 
+		~Player () override;
 		/*Player ( const Player & p );
 		Player & operator = ( const Player & p );*/
 		int getSpeed () const;
 		int getHP () const;
 		int getScore () const;
-		queue<Bomb> getBombStack() const;
+		queue<Bomb*> getBombStack() const;
 		pair<int, int> getPos () const;
 		void setPos ( int i, int j );
 		string getName() const;
@@ -58,13 +59,14 @@ class Player : public GameObject
 		void setMoveset( char a, char b, char c, char d, char e );
 		bool hasInMoveset ( char k );
 		Moveset getMoveset () const;
-		void PlaceBomb();
-		~Player () {}
+		void placeBomb( vector<vector<GameObject*>> & gameMap );
+		pair<int, int> getDirectedPos() const;
+		void setHP ( int nhp );
 	protected:
 		pair<int, int> mapPos;
 		int speed, hp, score;
 		Moveset move;
-		queue<Bomb> bombs;
+		queue<Bomb*> bombs;
 		//set<Buff> buffs;
 		//Moveset move;
 		string name;

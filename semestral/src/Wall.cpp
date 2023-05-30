@@ -1,16 +1,52 @@
 #include "GameObject.h"
+#include <chrono>
 
 class Wall : public GameObject
 {
 	public:
-		Wall () : GameObject () { }
-		Wall ( int hp, char r ) : GameObject ( hp, r ) 
+		Wall () : GameObject( 0, ' ' ) { hp = 0; }
+		Wall ( char r )
 		{
-			if ( r == '|' || r == '-' ) { hp = -1; pernament = 1; visibility = 1; }
-			if ( r == '#' )             { hp = 10; pernament = 0; visibility = 1; }
-			if ( r == '~' )             { hp = 1;  pernament = 0; visibility = 1; }
-			else                        { hp = 0,  pernament = 0; visibility = 0; }
+			mapRep = r;
+			if ( r == '|' || r == '-' ) hp = 666; 
+			else if ( r == '#' )        hp =  6;  
+			else if ( r == '~' || '$' ) hp =  2;   
+			else                        hp =  1;    
+		}
+		~Wall () override {}
+		virtual void update () override 
+		{
+			if ( hp < 0 )
+			{
+				hp = 0;
+				mapRep = ' ';
+			}
+		}	
+};
+
+class Explosion : public Wall
+{
+	public:
+		Explosion () : Wall ( '@' ) 
+		{
+			start = chrono::high_resolution_clock::now();
+			ttl = 1;
+			type = 10;
+		}
+		void ready()
+		{
+			auto now = chrono::high_resolution_clock::now();
+			int z = chrono::duration_cast<chrono::seconds>(now - start).count();
+			if ( z > ttl ) { hp = 0; mapRep = ' '; }
+		}
+		void update () override 
+		{
+			auto now = chrono::high_resolution_clock::now();
+			auto z = chrono::duration_cast<chrono::seconds>(now - start).count();
+			if ( z > 0.5 ) mapRep = '.';
+			ready();
 		}
 	private:
-		bool pernament, visibility;
+		chrono::system_clock::time_point start;
+		double ttl;
 };

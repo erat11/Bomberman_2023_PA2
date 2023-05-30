@@ -4,7 +4,6 @@
 #include "Interface.h"
 #include "Player.h"
 #include "AI.cpp"
-#include "Wall.cpp"
 #define PATH_TO_MAP_FILE "./config/maps/selected"
 
 class GameMap : public Interface
@@ -18,17 +17,23 @@ class GameMap : public Interface
 		void handleInput () override;
 		int getSizeX();
 		int getSizeY();
+		~GameMap ();
 	private:
 		int sizeX, sizeY, startX, startY;
-		vector<vector<GameObject>> gameMap;
+		vector<vector<GameObject*>> gameMap;
 		void mapPrint ();
-		void playerInfoPrint( const Player & p, int writeX, int writeY );
+		void playerInfoPrint( Player * p, int writeX, int writeY );
 		void printHearts ( int wx, int wy, int hp );
-		void swapper ( int a, int b, int c, int d, Player & p );
-		void handlePlayer ( char x, Player & player );
-		void handleBombPlacement ( Player & player );
-		Player player1, player2;
-		AI bot;
+		void swapper ( int a, int b, int c, int d, Player * p );
+		void handlePlayer ( char x, Player * player );
+		bool isPosEmpty ( int i, int j );
+		void updateBomb ( GameObject * y );
+		Player * player1, * player2;
+		AI * bot;
+		vector<Bomb> placedBombs;
+		vector<Explosion> explosions;
+
+
 };
 
 #endif
