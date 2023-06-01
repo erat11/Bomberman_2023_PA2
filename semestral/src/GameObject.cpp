@@ -10,3 +10,4 @@ void GameObject::mapDestroy () { mapRep = ' '; }
 int  GameObject::getType    () const { return type; }
 void GameObject::update () {}
 void GameObject::decreaseHP ( int amount ) { hp -= amount; }
+GameObject* GameObject::clone() const { return new GameObject ( *this ); }

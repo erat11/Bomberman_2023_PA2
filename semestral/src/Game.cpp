@@ -51,6 +51,7 @@ void Game::GameLoop( bool p )
 	else { if ( !playMap.load( seScreen.getHP(), NameScreen1.get(), "BOT"s ) ) return; }
 	
 	playMap.addDollars( seScreen.getDollarChance() );
+	playMap.setDropChance ( seScreen.getDropChance() );
 
 	//loop
 	playMap.handleInput();

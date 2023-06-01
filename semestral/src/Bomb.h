@@ -16,8 +16,10 @@ class Bomb : public GameObject
 		bool ready();
 		pair<int, int> getPos () const;
 		void setPos ( int i, int j );
+		void upgrade ();
+		Bomb * clone () const override;
 	protected:
-		int expRadius, detonationTime, damage;
+		int expRadius, detonationTime, damage, expWidth;
 		pair<int, int> mapPos;
 		chrono::system_clock::time_point start;
 		void explodeSide( vector<vector<GameObject*>> & gameMap, int i, int j, int dir );

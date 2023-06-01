@@ -18,6 +18,7 @@ class GameObject
 		int getType			  () const;
 		virtual void mapDestroy ();
 		void decreaseHP ( int amount );
+		virtual GameObject * clone() const;
 	protected:
 		int hp, type; // type: bomb = 0
 		char mapRep;

@@ -4,6 +4,7 @@
 #include "Interface.h"
 #include "Player.h"
 #include "AI.cpp"
+#include "BombUpgrade.cpp"
 #define PATH_TO_MAP_FILE "./config/maps/selected"
 
 class GameMap : public Interface
@@ -13,6 +14,7 @@ class GameMap : public Interface
 		GameMap ( const char * caption );
 		bool load ( int h, const string & s1, const string & s2 );
 		void addDollars ( int chance );
+		void setDropChance ( int chance );
 		void print () override;
 		void handleInput () override;
 		int getSizeX();
@@ -28,6 +30,7 @@ class GameMap : public Interface
 		void handlePlayer ( char x, Player * player );
 		bool isPosEmpty ( int i, int j );
 		void updateBomb ( GameObject * y );
+		Buff * pickRandomBuff();
 		Player * player1, * player2;
 		AI * bot;
 		vector<Bomb> placedBombs;

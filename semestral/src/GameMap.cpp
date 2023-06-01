@@ -1,5 +1,7 @@
 #include "GameMap.h"
 
+int Wall::dropChance = 0;
+
 GameMap::GameMap () : Interface () {}
 
 GameMap::GameMap ( const char * caption ) : Interface ( caption )
@@ -45,10 +47,10 @@ bool GameMap::load ( int hp, const string & s1, const string & s2 )
 		file.close();
 		//todo verify map integrity
 		player1 = new Player ( 1, 1, hp, 'P', s1 );
-		player1->setMoveset( 'w', 's', 'a', 'd', ' ' );
+		player1->setMoveset( 'w', 's', 'a', 'd', ' ', 'b' );
 		if ( s2 == "BOT" ) player2 = new AI ( sizeX - 2, sizeY - 2, hp, 'Q', s2 );
 		else player2 = new Player ( sizeX - 2, sizeY - 2, hp, 'Q', s2 );
-		player2->setMoveset( '8', '5', '4', '6', '+' );
+		player2->setMoveset( '8', '5', '4', '6', '+', '-' );
 		delete gameMap[1][1];
 		delete gameMap[sizeX - 2][sizeY - 2];
 		gameMap[1][1] = player1;
@@ -116,8 +118,13 @@ void GameMap::mapPrint ()
 				{
 					z->detonate( gameMap );
 					delete gameMap[z->getPos().first][z->getPos().second];
-					gameMap[z->getPos().first][z->getPos().second] = new Explosion();
+					gameMap[z->getPos().first][z->getPos().second] = new Explosion( ' ' );
 				}
+			}
+			else if ( gameMap[i][j]->getType() == 10 )
+			{
+				if ( gameMap[i][j]->getMapRep() == ' ' ) { delete gameMap[i][j]; gameMap[i][j] = new Wall(); }
+				else if ( gameMap[i][j]->getMapRep() == '!' ) { delete gameMap[i][j]; gameMap[i][j] = new Buff(); }
 			}
 			mvprintw( writeX, writeY++, "%c", gameMap[i][j]->getMapRep() );
 		}
@@ -156,6 +163,17 @@ void GameMap::playerInfoPrint( Player * p, int writeX, int writeY )
 	mvprintw( writeX, writeY, "Score: " );
 	writeY += 10;
 	mvprintw( writeX, writeY, "%d", p->getScore() );
+	writeX++;
+	writeY = wY;
+	mvprintw( writeX, writeY, "BUFFS: " );
+	writeY += 10;
+	mvprintw( writeX, writeY, "%d", p->getBuffStack().size() );
+	writeX++;
+	writeY = wY;
+	mvprintw( writeX, writeY, "CURRENT BUFF: " );
+	writeY += 16;
+	if ( !p->getBuffStack().size() ) mvprintw( writeX, writeY, "none" );
+	else mvprintw( writeX, writeY, p->getBuffStack().front()->getName().c_str() );
 }
 
 void GameMap::printHearts ( int wx, int wy, int hp )
@@ -172,6 +190,10 @@ void GameMap::printHearts ( int wx, int wy, int hp )
 void GameMap::swapper ( int a, int b, int c, int d, Player * player )
 {
 	player->setPos( c, d );
+	if ( gameMap[c][d]->getType() == 8 )
+	{
+		player->addBuff( pickRandomBuff() );
+	}
 	delete gameMap[c][d];
 	gameMap[c][d] = player;
 	gameMap[a][b] = new Wall ( ' ' );
@@ -185,9 +207,21 @@ void GameMap::handlePlayer ( char key, Player * player )
 	else if ( player->getMoveset().down() == key  && isPosEmpty( i + 1, j ) ) swapper ( i, j, i + 1, j, player );
 	else if ( player->getMoveset().up() == key    && isPosEmpty( i - 1, j ) ) swapper ( i, j, i - 1, j, player );
 	else if ( player->getMoveset().bomb() == key ) player->placeBomb( gameMap );
+	else if ( player->getMoveset().buff() == key ) player->activateBuff();
 }
 
 bool GameMap::isPosEmpty( int i, int j )
 {
-	return gameMap[i][j]->getMapRep() == ' ';
+	return gameMap[i][j]->getMapRep() == ' ' || gameMap[i][j]->getType() == 8;
+}
+
+void GameMap::setDropChance( int chance )
+{
+	Wall w;
+	w.setDropChance( chance );
+}
+
+Buff * GameMap::pickRandomBuff()
+{
+	return new BombUpgrade();
 }

@@ -1,11 +1,29 @@
-class Buff
+#ifndef BUFF_H
+#define BUFF_H
+
+#include "GameObject.h"
+#include <string>
+#include "Bomb.h"
+
+struct PlayerAttributes
+{
+	pair<int, int> mapPos;
+	int speed, hp, score;
+	Bomb defaultBomb;
+};
+
+
+class Buff : public GameObject
 {
 	public:
-		Buff () {}
-		virtual void takeEffect () {}
-		virtual ~Buff() {}
-	private:
+		Buff ();
+		virtual void activate ( PlayerAttributes & plAttr );
+		virtual ~Buff() override;
+		string getName() const;
+		Buff * clone () const override;
+	protected:
 		int duration;
-		bool permanence;
-		double dropChance;
+		string name;
 };
+
+#endif

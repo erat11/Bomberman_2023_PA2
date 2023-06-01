@@ -1,13 +1,12 @@
 #include "Bomb.h"
 
-Bomb::Bomb ()
+Bomb::Bomb () : GameObject ( 1, 'O')
 {
-	mapRep = 'O';
-	hp = 1;
 	expRadius = 4;
 	damage = 2;
 	detonationTime = 2;
 	type = 1;
+	expWidth = 1;
 }
 
 void Bomb::lightBomb()
@@ -43,17 +42,31 @@ void Bomb::explodeSide( vector<vector<GameObject*>> & gameMap, int i, int j, int
 		i += x;
 		j += y;
 		if ( abs(i + 1) < gameMap.size() && i > 0 && abs(j + 1) < gameMap[0].size() && j > 0 )
+		{
 			if ( gameMap[i][j]->getHP() <= damage && gameMap[i][j]->getType() != 2 )
 			{
+				char w = gameMap[i][j]->getMapRep();
 				delete gameMap[i][j];
-				gameMap[i][j] = new Explosion();
+				gameMap[i][j] = new Explosion( w );
 				
 			}
 			else { gameMap[i][j]->decreaseHP( damage ); break; }
+		}
 	}
 }
 
-
-
 pair<int, int> Bomb::getPos () const { return mapPos; }
 void Bomb::setPos ( int i, int j ) { mapPos = make_pair ( i, j ); }
+
+void Bomb::upgrade () 
+{ 
+	damage++;
+	expRadius++;
+	expWidth += 2;
+	if ( expWidth > 3 ) expWidth = 3;
+	detonationTime -= 0.2;
+	if ( detonationTime < 1 ) detonationTime = 1;
+	//update mapRep
+}
+
+Bomb * Bomb::clone () const { return new Bomb ( *this ); }
