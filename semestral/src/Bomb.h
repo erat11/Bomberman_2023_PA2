@@ -23,6 +23,7 @@ class Bomb : public GameObject
 		pair<int, int> mapPos;
 		chrono::system_clock::time_point start;
 		void explodeSide( vector<vector<GameObject*>> & gameMap, int i, int j, int dir );
+		void explodeSide( vector<vector<GameObject*>> & gameMap, int i, int j, pair<int, int> p );
 };
 
 #endif

@@ -4,7 +4,7 @@
 #include "Interface.h"
 #include "Player.h"
 #include "AI.cpp"
-#include "BombUpgrade.cpp"
+#include "AllBuffs.cpp"
 #define PATH_TO_MAP_FILE "./config/maps/selected"
 
 class GameMap : public Interface

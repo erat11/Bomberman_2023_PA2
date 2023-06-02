@@ -51,7 +51,6 @@ class Player : public GameObject
 		/*Player ( const Player & p );
 		Player & operator = ( const Player & p );*/
 		int getSpeed () const;
-		int getHP () const;
 		int getScore () const;
 		queue<Bomb*> getBombStack() const;
 		queue<Buff*> getBuffStack() const;
@@ -65,9 +64,15 @@ class Player : public GameObject
 		Moveset getMoveset () const;
 		void placeBomb( vector<vector<GameObject*>> & gameMap );
 		pair<int, int> getDirectedPos() const;
-		void setHP ( int nhp );
-		void activateBuff();
+		void setHP ( int nhp ) override;
+		void activateBuff( vector<vector<GameObject*>> & gameMap );
 		Player * clone () const override;
+		void sync ( vector<vector<GameObject*>> & gameMap );
+		int getHP () const override;
+		bool getBuffActive() const;
+		void decreaseHP( int d ) override;
+		bool isDestructable() const override;
+		bool wallHack () const;
 	protected:
 		PlayerAttributes attributes;
 		Moveset move;

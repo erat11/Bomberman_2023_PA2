@@ -2,8 +2,8 @@
 
 Bomb::Bomb () : GameObject ( 1, 'O')
 {
-	expRadius = 4;
-	damage = 2;
+	expRadius = 3;
+	damage = 1;
 	detonationTime = 2;
 	type = 1;
 	expWidth = 1;
@@ -25,6 +25,22 @@ void Bomb::detonate( vector<vector<GameObject*>> & gameMap )
 {
 	int i = mapPos.first, j = mapPos.second, dir = 0;// 0 = NORTH, 1 = SOUTH, 2 = EAST, 3 = WEST
 	for ( dir = 0; dir < 4; ++dir) explodeSide( gameMap, i, j, dir );
+	if ( expWidth > 1 )
+	{
+		for (int k = 1; k < ((expWidth - 1) / 2)+1; ++k)
+		{
+			explodeSide( gameMap, i + k, j + k, make_pair(1, 2) );//SE
+			explodeSide( gameMap, i + k, j - k, make_pair(1, 3) );//SW
+			explodeSide( gameMap, i - k, j - k, make_pair(0, 3) );//NW
+			explodeSide( gameMap, i - k, j + k, make_pair(0, 2) );//NE
+		}
+	}
+}
+
+void Bomb::explodeSide( vector<vector<GameObject*>> & gameMap, int i, int j, pair<int, int> p )
+{
+	explodeSide( gameMap, i, j, p.first );
+	explodeSide( gameMap, i, j, p.second );
 }
 
 void Bomb::explodeSide( vector<vector<GameObject*>> & gameMap, int i, int j, int dir )
@@ -39,8 +55,6 @@ void Bomb::explodeSide( vector<vector<GameObject*>> & gameMap, int i, int j, int
 	}
 	for (int k = 0; k < expRadius; ++k)
 	{
-		i += x;
-		j += y;
 		if ( abs(i + 1) < gameMap.size() && i > 0 && abs(j + 1) < gameMap[0].size() && j > 0 )
 		{
 			if ( gameMap[i][j]->getHP() <= damage && gameMap[i][j]->getType() != 2 )
@@ -50,8 +64,14 @@ void Bomb::explodeSide( vector<vector<GameObject*>> & gameMap, int i, int j, int
 				gameMap[i][j] = new Explosion( w );
 				
 			}
-			else { gameMap[i][j]->decreaseHP( damage ); break; }
+			else 
+			{ 
+				if ( gameMap[i][j]->isDestructable() ) gameMap[i][j]->decreaseHP( damage ); 
+				break; 
+			}
 		}
+		i += x;
+		j += y;
 	}
 }
 

@@ -11,10 +11,14 @@ class Wall : public GameObject
 			mapRep = r;
 			if ( r == '|' || r == '-' ) hp = 666; 
 			else if ( r == '#' )        hp =  6;  
-			else if ( r == '~' || '$' ) hp =  2;   
-			else                        hp =  1;    
+			else if ( r == '~' || '$' ) hp =  1;   
+			else                        hp =  0;    
 		}
 		~Wall () override {}
+		bool isDestructable() const override
+		{
+			return !( mapRep == '|' || mapRep == '-' ); 
+		}
 		virtual void update () override 
 		{
 			if ( hp < 0 )
@@ -45,7 +49,7 @@ class Explosion : public Wall
 			int z = chrono::duration_cast<chrono::seconds>(now - start).count();
 			if ( z > ttl ) 
 			{ 
-				if ( ( ( previous == '~' || previous == '#' ) && rand() % 100 < dropChance ) || ( previous == '$' && rand() % 100 < dropChance * 3 ) )
+				if ( ( ( previous == '~' || previous == '#' ) && rand() % 100 < dropChance ) ||  previous == '$' )
 				{
 					hp = 1; mapRep = '!'; 
 				}

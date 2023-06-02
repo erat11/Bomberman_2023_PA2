@@ -79,8 +79,8 @@ void GameMap::print ()
 {
 	clear();
 	mapPrint();
-	playerInfoPrint( player1, 10, ( maxY - sizeY ) / 10);
-	playerInfoPrint( player2, maxX - 10, ( ( maxY ) / 10 ) * 8 );
+	playerInfoPrint( player1, maxX/10, ( maxY - sizeY ) / 10) ;
+	playerInfoPrint( player2, maxX - maxX*3/10, ( ( maxY ) / 10 ) * 8 );
 	refresh();
 }
 
@@ -93,7 +93,8 @@ void GameMap::handleInput ()
 		if ( player1->hasInMoveset( key ) )                   handlePlayer ( key, player1 );
 		else if ( player2->hasInMoveset( key ) && player2->bot() ) handlePlayer ( key, player2 );
 		print();
-		player1->setHP( gameMap[player1->getPos().first][player1->getPos().second]->getHP() );
+		player1->sync( gameMap );
+		player2->sync( gameMap );
 		if ( key == '\n' ) break;
 		if ( player1->getHP() < 0 || player2->getHP() < 0 ) break;//winning screen
 	}
@@ -147,8 +148,7 @@ void GameMap::playerInfoPrint( Player * p, int writeX, int writeY )
 	mvprintw( writeX, writeY, p->getName().c_str() );
 	writeY += p->getName().size() + 2;
 	printHearts ( writeX, writeY, p->getHP() );
-	writeY = wY;
-	writeX++;
+	writeY = wY;writeX++;
 	mvprintw( writeX, writeY, "Bombstack " );
 	writeY += 10;
 	queue<Bomb*> stackTmp = p->getBombStack();
@@ -158,22 +158,31 @@ void GameMap::playerInfoPrint( Player * p, int writeX, int writeY )
 		stackTmp.pop();
 		writeY += 2;
 	}
-	writeY = wY;
-	writeX++;
+	writeY = wY;writeX++;
 	mvprintw( writeX, writeY, "Score: " );
 	writeY += 10;
 	mvprintw( writeX, writeY, "%d", p->getScore() );
-	writeX++;
-	writeY = wY;
-	mvprintw( writeX, writeY, "BUFFS: " );
-	writeY += 10;
-	mvprintw( writeX, writeY, "%d", p->getBuffStack().size() );
-	writeX++;
-	writeY = wY;
+	writeX++;writeY = wY;
 	mvprintw( writeX, writeY, "CURRENT BUFF: " );
 	writeY += 16;
 	if ( !p->getBuffStack().size() ) mvprintw( writeX, writeY, "none" );
 	else mvprintw( writeX, writeY, p->getBuffStack().front()->getName().c_str() );
+	writeX++;writeY = wY;
+	mvprintw( writeX, writeY, "BUFFS: " );
+	writeY += 10;
+	mvprintw( writeX, writeY, "%d", p->getBuffStack().size() );
+	queue<Buff*> stackTmp2 = p->getBuffStack();
+	writeY = wY;
+	while ( !stackTmp2.empty() )
+	{
+		writeX++;
+		mvprintw( writeX, writeY, stackTmp2.front()->getName().c_str() );
+		stackTmp2.pop();
+	}
+	writeX++;writeY = wY;
+	if ( p->getBuffActive() ) mvprintw( writeX, writeY, "%.1f", p->getBuffStack().front()->getDuration() - 
+		p->getBuffStack().front()->timer()) ;
+
 }
 
 void GameMap::printHearts ( int wx, int wy, int hp )
@@ -189,25 +198,25 @@ void GameMap::printHearts ( int wx, int wy, int hp )
 
 void GameMap::swapper ( int a, int b, int c, int d, Player * player )
 {
-	player->setPos( c, d );
-	if ( gameMap[c][d]->getType() == 8 )
+	if ( gameMap[c][d]->getMapRep() != '|' && gameMap[c][d]->getMapRep() != '-' && gameMap[c][d]->getType() != 2 )
 	{
-		player->addBuff( pickRandomBuff() );
+		player->setPos( c, d );
+		if ( gameMap[c][d]->getType() == 8 ) player->addBuff( pickRandomBuff() );
+		delete gameMap[c][d];
+		gameMap[c][d] = player;
+		gameMap[a][b] = new Wall ( ' ' );
 	}
-	delete gameMap[c][d];
-	gameMap[c][d] = player;
-	gameMap[a][b] = new Wall ( ' ' );
 }
 
 void GameMap::handlePlayer ( char key, Player * player )
 {
 	int i = player->getPos().first, j = player->getPos().second;
-	if      ( player->getMoveset().left() == key  && isPosEmpty( i, j - 1 ) ) swapper ( i, j, i, j - 1, player );
-	else if ( player->getMoveset().right() == key && isPosEmpty( i, j + 1 ) ) swapper ( i, j, i, j + 1, player );
-	else if ( player->getMoveset().down() == key  && isPosEmpty( i + 1, j ) ) swapper ( i, j, i + 1, j, player );
-	else if ( player->getMoveset().up() == key    && isPosEmpty( i - 1, j ) ) swapper ( i, j, i - 1, j, player );
+	if      ( player->getMoveset().left() == key  && ( isPosEmpty( i, j - 1 ) || player->wallHack() ) ) swapper ( i, j, i, j - 1, player );
+	else if ( player->getMoveset().right() == key && ( isPosEmpty( i, j + 1 ) || player->wallHack() ) ) swapper ( i, j, i, j + 1, player );
+	else if ( player->getMoveset().down() == key  && ( isPosEmpty( i + 1, j ) || player->wallHack() ) ) swapper ( i, j, i + 1, j, player );
+	else if ( player->getMoveset().up() == key    && ( isPosEmpty( i - 1, j ) || player->wallHack() ) ) swapper ( i, j, i - 1, j, player );
 	else if ( player->getMoveset().bomb() == key ) player->placeBomb( gameMap );
-	else if ( player->getMoveset().buff() == key ) player->activateBuff();
+	else if ( player->getMoveset().buff() == key && !player->getBuffActive() ) player->activateBuff( gameMap );
 }
 
 bool GameMap::isPosEmpty( int i, int j )
@@ -223,5 +232,13 @@ void GameMap::setDropChance( int chance )
 
 Buff * GameMap::pickRandomBuff()
 {
-	return new BombUpgrade();
+	int q = rand() % 6;
+	switch(q)
+	{
+		case(0): return new GainHP();
+		case(1): return new TimeBasedBuff(0);
+		case(2): return new TimeBasedBuff(1);
+		case(3): return new Explode();
+		default: return new BombUpgrade();
+	}
 }

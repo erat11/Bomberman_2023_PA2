@@ -14,11 +14,13 @@ class GameObject
 		char getMapRep        ();
 		virtual void update ();
 		void setMapRep  (char c);	
-		int getHP             () const;
+		virtual int getHP     () const;
 		int getType			  () const;
 		virtual void mapDestroy ();
-		void decreaseHP ( int amount );
+		virtual void decreaseHP ( int amount );
 		virtual GameObject * clone() const;
+		virtual void setHP ( int nhp );
+		virtual bool isDestructable() const;
 	protected:
 		int hp, type; // type: bomb = 0
 		char mapRep;

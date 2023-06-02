@@ -11,3 +11,5 @@ int  GameObject::getType    () const { return type; }
 void GameObject::update () {}
 void GameObject::decreaseHP ( int amount ) { hp -= amount; }
 GameObject* GameObject::clone() const { return new GameObject ( *this ); }
+void GameObject::setHP ( int nhp ) { hp = nhp; }
+bool GameObject::isDestructable() const { return true; }

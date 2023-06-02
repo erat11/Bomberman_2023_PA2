@@ -29,7 +29,7 @@ Player::~Player ()
 }
 
 int    Player::getSpeed () const { return attributes.speed; }
-int    Player::getHP    () const { return attributes.hp;    }
+int    Player::getHP () const { return attributes.hp; }
 int    Player::getScore () const { return attributes.score; }
 string Player::getName  () const { return name;  }
 void Player::setPos ( int i, int j ) { attributes.mapPos = make_pair ( i, j ); }
@@ -42,18 +42,18 @@ queue<Bomb*> Player::getBombStack() const { return bombs; }
 
 void Player::placeBomb( vector<vector<GameObject*>> & gameMap )
 {
-	Bomb * b = bombs.front();
 	auto x = getDirectedPos();
 	if ( gameMap[x.first][x.second]->getMapRep() == ' ' )
 	{
+		Bomb * b = bombs.front();
+		b->setPos( getDirectedPos().first, getDirectedPos().second );
+		b->lightBomb();
 		delete gameMap[x.first][x.second];
-		gameMap[x.first][x.second] = b;
+		gameMap[x.first][x.second] = b->clone();
+		delete b;
+		bombs.pop();
+		bombs.push ( attributes.defaultBomb.clone() );
 	}
-	b->setPos( getDirectedPos().first, getDirectedPos().second );
-	b->lightBomb();
-
-	bombs.pop();
-	bombs.push ( attributes.defaultBomb.clone() );
 }
 
 void Player::initBombStack ()
@@ -82,14 +82,17 @@ void Player::addBuff ( Buff * b )
 	buffs.push( b );
 }
 
-void Player::activateBuff()
+void Player::activateBuff( vector<vector<GameObject*>> & gameMap )
 {
 	if ( buffs.size() )
 	{
-		buffs.front()->activate( attributes );
-		reloadBombStack();
-		delete buffs.front();
-		buffs.pop();
+		buffs.front()->activate( attributes, gameMap );
+		if ( !buffs.front()->isActive() )
+		{
+			reloadBombStack();//faulty if new granade is present
+			delete buffs.front();
+			buffs.pop();
+		}
 	}
 }
 
@@ -104,4 +107,30 @@ void Player::reloadBombStack ()
 		bombs.pop();
 	}
 	initBombStack();
+}
+
+void Player::sync ( vector<vector<GameObject*>> & gameMap )
+{
+	if ( getBuffActive() && !buffs.front()->isActive() )
+	{
+		attributes.buffActive = false;
+		delete buffs.front();
+		buffs.pop();
+		attributes.destructable = true;
+		attributes.wallHack = false;
+	}
+}
+
+bool Player::getBuffActive() const { return attributes.buffActive; }
+
+void Player::decreaseHP( int d )
+{
+	attributes.hp -= d;
+}
+
+bool Player::isDestructable() const { return attributes.destructable; }
+
+bool Player::wallHack () const
+{
+	return attributes.wallHack;
 }
