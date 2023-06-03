@@ -6,11 +6,11 @@ Player::Player ( int x, int y, int hp, char r, const string & name ) : GameObjec
 	type = 2;
 	this->name = name;
 	isBot = false;
-	initBombStack();
 	attributes.hp = hp;
 	attributes.mapPos = make_pair ( x, y );
 	attributes.score = 0;
-	attributes.defaultBomb = Bomb();
+	attributes.defaultBomb = Bomb( mapRep == 'Q' );
+	initBombStack();
 }
 Player::~Player ()
 {
@@ -30,7 +30,6 @@ Player::~Player ()
 
 int    Player::getSpeed () const { return attributes.speed; }
 int    Player::getHP () const { return attributes.hp; }
-int    Player::getScore () const { return attributes.score; }
 string Player::getName  () const { return name;  }
 void Player::setPos ( int i, int j ) { attributes.mapPos = make_pair ( i, j ); }
 pair<int, int> Player::getPos () const { return attributes.mapPos; }
@@ -134,3 +133,9 @@ bool Player::wallHack () const
 {
 	return attributes.wallHack;
 }
+
+long long Player::getScore () const { return attributes.score; }
+
+void Player::addScore ( long long s ) { attributes.score += s; }
+
+int Player::getMultiplier () const { return attributes.multiplier; }

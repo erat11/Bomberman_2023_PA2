@@ -96,7 +96,26 @@ void GameMap::handleInput ()
 		player1->sync( gameMap );
 		player2->sync( gameMap );
 		if ( key == '\n' ) break;
-		if ( player1->getHP() < 0 || player2->getHP() < 0 ) break;//winning screen
+		if ( player1->getHP() <= 0 || player2->getHP() <= 0 )
+		{
+			napms(1000);
+			string winner;
+			long long winnerScore = 0;
+			if ( player1->getHP() <= 0 ) { winner = player2->getName(); winnerScore = player2->getScore(); }
+			else { winner = player1->getName();	winnerScore = player1->getScore(); }		
+			clear();
+			refresh();
+			writeX = maxX / 2;
+			writeY = ( maxY - winner.size() - 5 ) / 2;
+			mvprintw( writeX, writeY, winner.c_str() );
+			writeY += winner.size() + 1;
+			mvprintw( writeX, writeY, "WINS!" );
+			napms(2500);
+			refresh();
+			Leaderboard l = Leaderboard ();
+			l.save( winner, winnerScore );
+			return;
+		}
 	}
 }
 
@@ -114,13 +133,18 @@ void GameMap::mapPrint ()
 		{
 			if ( gameMap[i][j]->getType() == 1 )
 			{
-				Bomb * z = dynamic_cast<Bomb *> ( gameMap[i][j] );
+				Bomb * z = dynamic_cast<Bomb *> ( gameMap[i][j] )->clone();
 				if ( z->ready() ) 
 				{
 					z->detonate( gameMap );
+
+					if ( !z->getPlayer() ) player1->addScore( z->getScore() * player1->getMultiplier() );
+					else player2->addScore( z->getScore() * player2->getMultiplier() );
+
 					delete gameMap[z->getPos().first][z->getPos().second];
 					gameMap[z->getPos().first][z->getPos().second] = new Explosion( ' ' );
 				}
+				delete z;
 			}
 			else if ( gameMap[i][j]->getType() == 10 )
 			{
@@ -232,13 +256,15 @@ void GameMap::setDropChance( int chance )
 
 Buff * GameMap::pickRandomBuff()
 {
-	int q = rand() % 6;
+	int q = rand() % 8;
 	switch(q)
 	{
 		case(0): return new GainHP();
 		case(1): return new TimeBasedBuff(0);
 		case(2): return new TimeBasedBuff(1);
 		case(3): return new Explode();
-		default: return new BombUpgrade();
+		case(4): return new ScoreMultiplier();
+		case(5): return new BombUpgrade();
+		default: return new ScoreBonus();
 	}
 }

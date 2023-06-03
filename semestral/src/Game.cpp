@@ -24,6 +24,11 @@ void Game::Run ()
 		seScreen.handleInput();
 		Run();
 	}
+	else if ( stScreen.get() == "Leaderboard" )
+	{
+		auto leaderboard = Leaderboard( " Leaderboard ");
+		Run();
+	}
 }
 
 void Game::StartGame()
@@ -55,6 +60,7 @@ void Game::GameLoop( bool p )
 
 	//loop
 	playMap.handleInput();
+	auto leaderboard = Leaderboard( "Leaderboard");
 }
 
 Game::~Game () {}

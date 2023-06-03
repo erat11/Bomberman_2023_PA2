@@ -1,12 +1,16 @@
 #include "Bomb.h"
 
-Bomb::Bomb () : GameObject ( 1, 'O')
+Bomb::Bomb () : GameObject () {}
+
+Bomb::Bomb ( bool player ) : GameObject ( 1, 'O' )
 {
 	expRadius = 3;
 	damage = 1;
 	detonationTime = 2;
 	type = 1;
 	expWidth = 1;
+	score = 0;
+	this->player = player;
 }
 
 void Bomb::lightBomb()
@@ -27,7 +31,7 @@ void Bomb::detonate( vector<vector<GameObject*>> & gameMap )
 	for ( dir = 0; dir < 4; ++dir) explodeSide( gameMap, i, j, dir );
 	if ( expWidth > 1 )
 	{
-		for (int k = 1; k < ((expWidth - 1) / 2)+1; ++k)
+		for (int k = 1; k < ( ( expWidth - 1 ) / 2) + 1; ++k )
 		{
 			explodeSide( gameMap, i + k, j + k, make_pair(1, 2) );//SE
 			explodeSide( gameMap, i + k, j - k, make_pair(1, 3) );//SW
@@ -57,6 +61,7 @@ void Bomb::explodeSide( vector<vector<GameObject*>> & gameMap, int i, int j, int
 	{
 		if ( abs(i + 1) < gameMap.size() && i > 0 && abs(j + 1) < gameMap[0].size() && j > 0 )
 		{
+			score += gameMap[i][j]->getScore();
 			if ( gameMap[i][j]->getHP() <= damage && gameMap[i][j]->getType() != 2 )
 			{
 				char w = gameMap[i][j]->getMapRep();
@@ -83,10 +88,13 @@ void Bomb::upgrade ()
 	damage++;
 	expRadius++;
 	expWidth += 2;
-	if ( expWidth > 3 ) expWidth = 3;
+	if ( expWidth > 5 ) expWidth = 5;
 	detonationTime -= 0.2;
 	if ( detonationTime < 1 ) detonationTime = 1;
-	//update mapRep
 }
 
 Bomb * Bomb::clone () const { return new Bomb ( *this ); }
+
+bool Bomb::getPlayer() const { return player; }
+
+long long Bomb::getScore () const { return score; }

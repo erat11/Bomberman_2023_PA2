@@ -5,6 +5,7 @@
 #include "Player.h"
 #include "AI.cpp"
 #include "AllBuffs.cpp"
+#include "Leaderboard.cpp"
 #define PATH_TO_MAP_FILE "./config/maps/selected"
 
 class GameMap : public Interface

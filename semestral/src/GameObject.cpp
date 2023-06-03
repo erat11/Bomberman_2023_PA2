@@ -1,6 +1,6 @@
 #include "GameObject.h"
 
-GameObject::GameObject () {}
+GameObject::GameObject () { score = 0;}
 GameObject :: ~GameObject () {}
 GameObject::GameObject ( int hp, char r ) : hp ( hp ), mapRep( r ) {}
 char GameObject::getMapRep  () { update(); return mapRep; }
@@ -13,3 +13,4 @@ void GameObject::decreaseHP ( int amount ) { hp -= amount; }
 GameObject* GameObject::clone() const { return new GameObject ( *this ); }
 void GameObject::setHP ( int nhp ) { hp = nhp; }
 bool GameObject::isDestructable() const { return true; }
+long long GameObject::getScore () const { return score; }

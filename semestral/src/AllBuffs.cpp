@@ -7,9 +7,29 @@ class BombUpgrade : public Buff
 		virtual void activate ( PlayerAttributes & plAttr, vector<vector<GameObject*>> & gameMap ) override
 		{
 			plAttr.defaultBomb.upgrade();
+			plAttr.score += 1000;
 		}
 };
 
+class ScoreMultiplier : public Buff
+{
+	public:
+		ScoreMultiplier () : Buff () { name = "Score Multiplier x2"; }
+		virtual void activate ( PlayerAttributes & plAttr, vector<vector<GameObject*>> & gameMap ) override
+		{
+			plAttr.multiplier *= 2;
+		}
+};
+
+class ScoreBonus : public Buff
+{
+	public:
+		ScoreBonus () : Buff () { name = "Score Bonus"; }
+		virtual void activate ( PlayerAttributes & plAttr, vector<vector<GameObject*>> & gameMap ) override
+		{
+			plAttr.score += 25000 * plAttr.multiplier;
+		}
+};
 
 class GainHP : public Buff
 {
@@ -19,6 +39,7 @@ class GainHP : public Buff
 		{
 			plAttr.hp++;
 			gameMap[plAttr.mapPos.first][plAttr.mapPos.second]->decreaseHP( -1 );
+			plAttr.score += 1000;
 		}
 };
 
@@ -36,6 +57,7 @@ class TimeBasedBuff : public Buff
 		}
 		virtual void activate ( PlayerAttributes & plAttr, vector<vector<GameObject*>> & gameMap ) override
 		{
+			plAttr.score += 1000;
 			plAttr.buffActive = true;
 			start = chrono::high_resolution_clock::now();
 			plAttr.destructable = false;
@@ -66,6 +88,7 @@ class Explode : public Buff
 		Explode () : Buff () { name = "Boom"; }
 		virtual void activate ( PlayerAttributes & plAttr, vector<vector<GameObject*>> & gameMap ) override
 		{
+			plAttr.score += 5000;
 			for ( int i = -3; i < 4; ++i  )
 				for (int j = -3; j < 4; ++j)
 					if ( plAttr.mapPos.first + i > 0 && abs(plAttr.mapPos.first + i) < gameMap.size() &&

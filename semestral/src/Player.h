@@ -48,10 +48,7 @@ class Player : public GameObject
 		Player ();
 		Player ( int x, int y, int hp, char r,  const string & name ); 
 		~Player () override;
-		/*Player ( const Player & p );
-		Player & operator = ( const Player & p );*/
 		int getSpeed () const;
-		int getScore () const;
 		queue<Bomb*> getBombStack() const;
 		queue<Buff*> getBuffStack() const;
 		void addBuff ( Buff * b );
@@ -73,6 +70,9 @@ class Player : public GameObject
 		void decreaseHP( int d ) override;
 		bool isDestructable() const override;
 		bool wallHack () const;
+		long long getScore () const override;
+		void addScore ( long long s );
+		int getMultiplier () const;
 	protected:
 		PlayerAttributes attributes;
 		Moveset move;

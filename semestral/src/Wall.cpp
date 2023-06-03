@@ -5,14 +5,14 @@
 class Wall : public GameObject
 {
 	public:
-		Wall () : GameObject( 0, ' ' ) { hp = 0; }
+		Wall () : GameObject( 0, ' ' ) { hp = 0; score = 0; }
 		Wall ( char r )
 		{
 			mapRep = r;
 			if ( r == '|' || r == '-' ) hp = 666; 
-			else if ( r == '#' )        hp =  6;  
-			else if ( r == '~' || '$' ) hp =  1;   
-			else                        hp =  0;    
+			else if ( r == '#' )        { hp =  6; score = 100; }
+			else if ( r == '~' || '$' ) { hp = 1; score = 30; }
+			else                        { hp =  0; score = 0; }
 		}
 		~Wall () override {}
 		bool isDestructable() const override
@@ -30,6 +30,7 @@ class Wall : public GameObject
 		static int dropChance;
 		void setDropChance ( int chance ) { dropChance = chance; }
 		virtual Wall * clone () const override  { return new Wall ( *this ); }
+		long long getScore () const override { return score; }
 };
 
 class Explosion : public Wall

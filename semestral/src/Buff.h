@@ -8,12 +8,13 @@
 struct PlayerAttributes
 {
 	pair<int, int> mapPos;
-	int speed, hp, score;
+	int speed, hp;
+	long long score;
 	Bomb defaultBomb;
 	bool buffActive = false;
 	bool destructable = true;
 	bool wallHack = false;
-	int scoreMultiplier = 1;
+	int multiplier = 1;
 };
 
 
