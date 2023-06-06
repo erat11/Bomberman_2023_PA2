@@ -22,6 +22,7 @@ void Game::Run ()
 		auto seScreen = SettingsScreen ( boxNames );
 		seScreen.load();
 		seScreen.handleInput();
+		if ( seScreen.getChoice() ) auto x = MapChooseScreen();
 		Run();
 	}
 	else if ( stScreen.get() == "Leaderboard" )

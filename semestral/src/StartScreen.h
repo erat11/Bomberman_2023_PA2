@@ -11,7 +11,7 @@ class StartScreen : public Interface
 		StartScreen ( const vector<string> & v );
 		virtual void print () override;
 		virtual void handleInput () override;
-		string get ();
+		virtual string get () const;
 	private:
 		string jumpTo;
 };

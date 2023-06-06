@@ -6,8 +6,8 @@
 class SettingsScreen : public StartScreen
 {
 	public:
-		SettingsScreen () : StartScreen () {}
-		SettingsScreen ( const vector<string> & v ) : StartScreen ( v ) { }
+		SettingsScreen () : StartScreen () { mapChoice = false; }
+		SettingsScreen ( const vector<string> & v ) : StartScreen ( v ) { mapChoice = false; }
 		int getDropChance() { return dropChance; }
 		int getDollarChance() { return dollarChance; }
 		int getBaloons() { return baloons; }
@@ -65,7 +65,6 @@ class SettingsScreen : public StartScreen
 						if ( z.topLeftX <= event.y && z.topLeftY <= event.x &&
 						 z.bottomRightX >= event.y && z.bottomRightY >= event.x )
 						{
-							//todo
 							if      ( z.jumpTo == "Reset Default & Exit"  ) { reset(); return; }
 							else if ( z.jumpTo == "Save & Exit"           ) { save(); return; }
 							else if ( z.jumpTo == "Drop Chance Percent"   ) { increaseDC(); }
@@ -73,12 +72,15 @@ class SettingsScreen : public StartScreen
 							else if ( z.jumpTo == "HP count"              ) { increaseHP(); }
 							else if ( z.jumpTo == "Debuffs On/Off"        ) { debuffs = ! debuffs; }
 							else if ( z.jumpTo == "Baloons On/Off"        ) { baloons = ! baloons; }
+							else if ( z.jumpTo == "Choose Map"            ) { mapChoice = true; return; }
 						}
 				ch = '!';
 			}
 		}
+		bool getChoice () const { return mapChoice; }
 	private:
 		int dropChance, dollarChance, baloons, debuffs, hp;
+		bool mapChoice;
 		void save ()
 		{
 			ofstream settings( PATH_TO_SETTINGS );

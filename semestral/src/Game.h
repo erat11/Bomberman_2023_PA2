@@ -8,6 +8,7 @@
 #include "Player.h"
 #include "GameMap.h"
 #include "SettingsScreen.cpp"
+#include "MapChooseScreen.cpp"
 
 class Game
 {

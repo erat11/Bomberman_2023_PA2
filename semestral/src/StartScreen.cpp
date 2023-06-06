@@ -39,4 +39,4 @@ void StartScreen::handleInput ()
 				}
 	}
 }
-string StartScreen::get () { return jumpTo; }
+string StartScreen::get () const { return jumpTo; }
