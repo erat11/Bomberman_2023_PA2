@@ -5,13 +5,14 @@
 class Wall : public GameObject
 {
 	public:
-		Wall () : GameObject( 0, ' ' ) { hp = 0; score = 0; }
+		Wall () : GameObject( 0, ' ' ) { hp = 0; score = 0; type = 7; }
 		Wall ( char r )
 		{
+			type = 7;
 			mapRep = r;
 			if ( r == '|' || r == '-' ) hp = 666; 
-			else if ( r == '#' )        { hp =  6; score = 100; }
-			else if ( r == '~' || '$' ) { hp = 1; score = 30; }
+			else if ( r == '#' )        { hp =  6; score = 200; }
+			else if ( r == '~' || r == '$' ) { hp = 1; score = 30; type = 6; }
 			else                        { hp =  0; score = 0; }
 		}
 		~Wall () override {}

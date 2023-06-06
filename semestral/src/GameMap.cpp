@@ -91,9 +91,11 @@ void GameMap::handleInput ()
 	{
 		key = getch();
 		if ( player1->hasInMoveset( key ) )                   handlePlayer ( key, player1 );
-		else if ( player2->hasInMoveset( key ) && player2->bot() ) handlePlayer ( key, player2 );
+		else if ( player2->hasInMoveset( key ) && !player2->bot() ) handlePlayer ( key, player2 );
 		print();
 		player1->sync( gameMap );
+		if ( player2->bot() && player2->getMove() ) handleAI();
+		
 		player2->sync( gameMap );
 		if ( key == '\n' ) break;
 		if ( player1->getHP() <= 0 || player2->getHP() <= 0 )
@@ -110,13 +112,45 @@ void GameMap::handleInput ()
 			mvprintw( writeX, writeY, winner.c_str() );
 			writeY += winner.size() + 1;
 			mvprintw( writeX, writeY, "WINS!" );
-			napms(2500);
 			refresh();
+			napms(2500);
 			Leaderboard l = Leaderboard ();
 			l.save( winner, winnerScore );
 			return;
 		}
 	}
+}
+
+void GameMap::handleAI()
+{
+	player2->activateBuff( gameMap ); 
+	player2->generateMove( gameMap );
+	if ( player2->mover != -1 ) 
+	{ 
+		if ( player2->mover <= 3 )
+		{
+			int a = 0, b = 0;
+			if ( player2->mover == 2 ) player2->setDirection( 3 );
+			else if (  player2->mover == 3 )player2->setDirection( 2 );
+			else player2->setDirection( player2->mover );
+			switch( player2->mover )
+			{
+				// 0 = NORTH, 1 = SOUTH, 2 = EAST, 3 = WEST
+				case(0):{ a = -1; break; }
+				case(1):{ a =  1; break; }
+				case(2):{ b =  1; break; }
+				default:{ b = -1; break; }
+			}
+			int i = player2->getPos().first, j = player2->getPos().second;
+			if ( isPosEmpty ( i + a, j + b ) )
+				swapper( i, j, i + a, j + b, player2 ); 
+		}
+		else if ( player2->mover == 4 ) { if ( !player2->getBuffActive() ) player2->activateBuff( gameMap ); }
+		else if ( player2->mover == 5 ) player2->placeBomb( gameMap );
+		else if ( player2->mover == 6 ) player2->freeze ( );
+		player2->mover = -1;
+	}
+	player2->resetMove(); 
 }
 
 int GameMap::getSizeX() { return sizeX; }
@@ -173,39 +207,44 @@ void GameMap::playerInfoPrint( Player * p, int writeX, int writeY )
 	writeY += p->getName().size() + 2;
 	printHearts ( writeX, writeY, p->getHP() );
 	writeY = wY;writeX++;
-	mvprintw( writeX, writeY, "Bombstack " );
-	writeY += 10;
-	queue<Bomb*> stackTmp = p->getBombStack();
-	while ( !stackTmp.empty() )
-	{
-		mvprintw( writeX, writeY, "%c ", stackTmp.front()->getMapRep() );
-		stackTmp.pop();
-		writeY += 2;
-	}
-	writeY = wY;writeX++;
 	mvprintw( writeX, writeY, "Score: " );
 	writeY += 10;
 	mvprintw( writeX, writeY, "%d", p->getScore() );
-	writeX++;writeY = wY;
-	mvprintw( writeX, writeY, "CURRENT BUFF: " );
-	writeY += 16;
-	if ( !p->getBuffStack().size() ) mvprintw( writeX, writeY, "none" );
-	else mvprintw( writeX, writeY, p->getBuffStack().front()->getName().c_str() );
-	writeX++;writeY = wY;
-	mvprintw( writeX, writeY, "BUFFS: " );
-	writeY += 10;
-	mvprintw( writeX, writeY, "%d", p->getBuffStack().size() );
-	queue<Buff*> stackTmp2 = p->getBuffStack();
-	writeY = wY;
-	while ( !stackTmp2.empty() )
+	writeY = wY;writeX++;
+	if ( !p->bot() )
 	{
-		writeX++;
-		mvprintw( writeX, writeY, stackTmp2.front()->getName().c_str() );
-		stackTmp2.pop();
+		mvprintw( writeX, writeY, "Bombstack " );
+		writeY += 10;
+		queue<Bomb*> stackTmp = p->getBombStack();
+		while ( !stackTmp.empty() )
+		{
+			mvprintw( writeX, writeY, "%c ", stackTmp.front()->getMapRep() );
+			stackTmp.pop();
+			writeY += 2;
+		}
+		writeX++;writeY = wY;
+		mvprintw( writeX, writeY, "CURRENT BUFF: " );
+		writeY += 16;
+		if ( !p->getBuffStack().size() ) mvprintw( writeX, writeY, "none" );
+		else mvprintw( writeX, writeY, p->getBuffStack().front()->getName().c_str() );
+		writeX++;writeY = wY;
+		mvprintw( writeX, writeY, "BUFFS: " );
+		writeY += 10;
+		mvprintw( writeX, writeY, "%d", p->getBuffStack().size() );
+		queue<Buff*> stackTmp2 = p->getBuffStack();
+		writeY = wY;
+		while ( !stackTmp2.empty() )
+		{
+			writeX++;
+			mvprintw( writeX, writeY, stackTmp2.front()->getName().c_str() );
+			stackTmp2.pop();
+		}
+		writeX++;writeY = wY;
+		if ( p->getBuffActive() ) mvprintw( writeX, writeY, "%.1f", p->getBuffStack().front()->getDuration() - 
+			p->getBuffStack().front()->timer()) ;
 	}
-	writeX++;writeY = wY;
-	if ( p->getBuffActive() ) mvprintw( writeX, writeY, "%.1f", p->getBuffStack().front()->getDuration() - 
-		p->getBuffStack().front()->timer()) ;
+	else mvprintw( writeX, writeY, "%d", player2->p );
+
 
 }
 

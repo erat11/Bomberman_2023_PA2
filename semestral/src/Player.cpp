@@ -51,7 +51,8 @@ void Player::placeBomb( vector<vector<GameObject*>> & gameMap )
 		gameMap[x.first][x.second] = b->clone();
 		delete b;
 		bombs.pop();
-		bombs.push ( attributes.defaultBomb.clone() );
+		if ( bombs.size() < 5 )
+			bombs.push ( attributes.defaultBomb.clone() );
 	}
 }
 
@@ -139,3 +140,9 @@ long long Player::getScore () const { return attributes.score; }
 void Player::addScore ( long long s ) { attributes.score += s; }
 
 int Player::getMultiplier () const { return attributes.multiplier; }
+
+bool Player::getMove() const { return false; }
+
+void Player::setDirection( int q ) { move.setDir( q ); }
+
+void Player::freeze () {  }

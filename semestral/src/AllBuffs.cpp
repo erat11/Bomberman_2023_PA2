@@ -37,7 +37,6 @@ class GainHP : public Buff
 		GainHP () : Buff () { name = "Gain HP"; }
 		virtual void activate ( PlayerAttributes & plAttr, vector<vector<GameObject*>> & gameMap ) override
 		{
-			plAttr.hp++;
 			gameMap[plAttr.mapPos.first][plAttr.mapPos.second]->decreaseHP( -1 );
 			plAttr.score += 1000;
 		}
@@ -52,7 +51,7 @@ class TimeBasedBuff : public Buff
 			switch(i)
 			{
 				default:{ name = "Immortality"; duration = 4; break; }
-				case(1):{ name = "Wall Hack ( walks through walls )"; duration = 2; break; }
+				case(1):{ name = "Wall Hack"; duration = 2; break; }
 			}
 		}
 		virtual void activate ( PlayerAttributes & plAttr, vector<vector<GameObject*>> & gameMap ) override

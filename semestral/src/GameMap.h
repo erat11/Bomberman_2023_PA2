@@ -29,11 +29,11 @@ class GameMap : public Interface
 		void printHearts ( int wx, int wy, int hp );
 		void swapper ( int a, int b, int c, int d, Player * p );
 		void handlePlayer ( char x, Player * player );
+		void handleAI();
 		bool isPosEmpty ( int i, int j );
 		void updateBomb ( GameObject * y );
 		Buff * pickRandomBuff();
 		Player * player1, * player2;
-		AI * bot;
 		vector<Bomb> placedBombs;
 		vector<Explosion> explosions;
 

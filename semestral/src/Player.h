@@ -37,6 +37,7 @@ class Moveset
 		char bomb  () const { return b; }
 		char buff  () const { return f; }
 		char direction () const { return dir; }
+		void setDir ( int q ) { dir = q; }
 	private:
 		char u, d, l, r, b, f;
 		int dir; // 0 = NORTH, 1 = SOUTH, 2 = EAST, 3 = WEST
@@ -45,6 +46,8 @@ class Moveset
 class Player : public GameObject
 {
 	public:
+		int p;
+		int mover;
 		Player ();
 		Player ( int x, int y, int hp, char r,  const string & name ); 
 		~Player () override;
@@ -73,6 +76,11 @@ class Player : public GameObject
 		long long getScore () const override;
 		void addScore ( long long s );
 		int getMultiplier () const;
+		virtual bool getMove() const;
+		virtual void resetMove () {}
+		virtual void generateMove ( vector<vector<GameObject*>> & gameMap ) {}
+		virtual void freeze ();
+		void setDirection( int q );
 	protected:
 		PlayerAttributes attributes;
 		Moveset move;
