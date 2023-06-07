@@ -1,0 +1,78 @@
+Hra Bomberman
+
+Hra sa zacina s predvolitelnymi nastaveniami na predvolitelnej 2D mape, hrac1 v lavom hornom rohu, hrac2 v pravom dolnom.
+Uloha oboch hracov je eliminovat druheho hraca a ziskat pri tom co najvyssie skore za odpalovanie bomb, stien a ziskavanie bonusov. Hraci mozu odpalovat lubovolne mnozstvo bomb, obaja zacinaju s bombou na levele 1, ktora ma nizke poskodenie, maly priemer vybuchu a dlhu odpalovaciu dobu. Level a atributy bomby sa daju zlepsit ziskanim a aktivovanim Bomb Upgrade Buffu. Pocas nicenia stien sa moze stat, ze zo steny padne buff ( alebo debuff ), ktory je na obrazovke reprezentovany ?. Hra sa konci ked sa jednemu z hracov znizi Hit Points atribut na 0, nasledne je skore vitaza ulozene do tabulky leaderboard. 
+
+Hra Bombernam umoznuje tyto dva rezimy
+
+    -Hru dvou hráčů na jednom počítači ( ovladani pomoci klavesnice )
+
+    -Hru proti počítači
+
+Implementujte nssledujici funkcionality:
+
+    -Implementujte jednoduchou AI pocitacoveho hrace, zdenene z player
+
+    -Vsechny zdi ( kromne krajnich ) je mozne znicit, po zniceni s urcitou pravdepodobností zanechaji bonus
+
+    -Typi zdi
+
+        krajne zdi: |, -, neznicitelne
+
+        obycejna zed ~, malo hitPoints, male skore za zniceni
+
+        silna zed #, vela hitPoints, vacsie skore za znicenie
+
+        bonusova zed $, stejne vlastnosti ako ~, 100% sanca na drop buffu ( nastavitelna sanca na vyskyt v Settings )
+
+        exploze @, ., kratkodoby pozostatok z explozie bomby
+
+    -Implementujte druhu bonusu ( sance jednotlivych bonusov su konfigurovatelne zo suboru ):
+
+        Bomb Upgrade: zvysenie 'levelu' bomby, zvacsenie sirky, dosahu a poskodenia bomby, znizenie odpalovaieho casu 
+
+        Gain HP: Zvysi Hit Points hraca o 1
+
+        Explode: Pri aktivacii detonuje okamzite okolie hraca sposobujuc poskodenie 1
+
+        Wall Hack: Hrac docasne ziska schopnost chodze cez vsetky nepernamentne objekty ( steny a bomby ), pri prechode je objekt zniceny
+
+        Immortality: Hrac docasne ziska schopnost nesmrtelnosti, tzn. imunita na akekolvek poskodenie
+
+        Score Multiplier: Hrac zacina s multipikatorom skore 1, kazda instancia zzdvojnasobuje tento multiplikator
+
+        Score Bonus: Hrac ziska fixne mnozstvo bodov do skore znasobeny multiplikatorom
+
+        Nasledovne bonusy existuju ako anti-bonusy tzv. debuffs, ktore maju reverznu funkciu k povodnej:
+
+            Bomb Upgrade ( Bomb Downgrade )
+
+            Gain Hp ( Loose HP )
+
+            Score Multiplier ( Score Demultiplier )
+
+        Bonusy su dedene z triedy Buff, ktore je dedena z gameobject
+
+
+    -Hra ma rozhranie Settings ( dedena z interface ), v ktorom sa da nastavit:
+
+        drop chance ( sanca na vyprodukovanie buffu pri zniceni )
+
+        dollar chance ( sanca na vygenerovanie bonusovej ( $ ) steny na mape )
+
+        debuffs on/off
+
+        hp count ( pocet zivotou oboch hracov na zaciatku hry )
+
+        reset defaults ( nastavenie predvolenych default hodot )
+
+        choose map ( vedie na dalsiu obrazovku s vyberom mapy, mapy su vykreslovane )
+
+    -Kazdy hrac ma k dispozicii bomby, ktore sa daju polozit na mapu, ak sa v hracovom smere nenechadza ziadny iny objekt ( smer je urceny hracovym poslednym pohybom )
+
+    -Hra ma rozhranie Leaderboard ( dedena z interface ), v ktorom sa nachadzaju najvyssie dosiahnute skore hracov
+
+Polymorfismus
+
+    Popisany v obrazku inheritanceChart.png
+
