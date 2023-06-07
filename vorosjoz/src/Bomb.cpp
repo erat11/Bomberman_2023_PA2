@@ -14,10 +14,19 @@ Bomb::Bomb ( bool player ) : GameObject ( 1, 'O' )
 	level = 1;
 }
 
-void Bomb::lightBomb()
-{
-	start = chrono::high_resolution_clock::now();
-}
+Bomb * Bomb::clone () const { return new Bomb ( *this ); }
+
+bool Bomb::getPlayer() const { return player; }
+
+long long Bomb::getScore () const { return score; }
+
+int Bomb::getLevel () const { return level; }
+
+void Bomb::lightBomb() { start = chrono::high_resolution_clock::now(); }
+
+pair<int, int> Bomb::getPos () const { return mapPos; }
+
+void Bomb::setPos ( int i, int j ) { mapPos = make_pair ( i, j ); }
 
 bool Bomb::ready( vector<vector<GameObject*>> gameMap )
 {
@@ -81,9 +90,6 @@ void Bomb::explodeSide( vector<vector<GameObject*>> & gameMap, int i, int j, int
 	}
 }
 
-pair<int, int> Bomb::getPos () const { return mapPos; }
-void Bomb::setPos ( int i, int j ) { mapPos = make_pair ( i, j ); }
-
 void Bomb::upgrade ( int i ) 
 { 
 	if ( ( i == -1 && level > 1 ) || i == 1 )
@@ -97,11 +103,3 @@ void Bomb::upgrade ( int i )
 		level += i;
 	}
 }
-
-Bomb * Bomb::clone () const { return new Bomb ( *this ); }
-
-bool Bomb::getPlayer() const { return player; }
-
-long long Bomb::getScore () const { return score; }
-
-int Bomb::getLevel () const { return level; }

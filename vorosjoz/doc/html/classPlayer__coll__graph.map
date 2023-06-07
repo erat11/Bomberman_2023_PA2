@@ -1,0 +1,7 @@
+<map id="Player" name="Player">
+<area shape="rect" id="node1" title=" " alt="" coords="111,260,173,287"/>
+<area shape="rect" id="node2" href="$classGameObject.html" title=" " alt="" coords="5,5,108,32"/>
+<area shape="rect" id="node5" href="$classBomb.html" title=" " alt="" coords="95,81,155,108"/>
+<area shape="rect" id="node3" href="$classMoveset.html" title=" " alt="" coords="229,171,308,197"/>
+<area shape="rect" id="node4" href="$structPlayerAttributes.html" title=" " alt="" coords="79,171,205,197"/>
+</map>

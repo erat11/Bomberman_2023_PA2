@@ -2,10 +2,7 @@
 
 
 Buff::Buff () { mapRep = '?'; type = 8; name = "Buff"; duration = 0; }
-void Buff::activate ( PlayerAttributes & plAttr, vector<vector<GameObject*>> & gameMap ) 
-{
-
-}
+void Buff::activate ( PlayerAttributes & plAttr, vector<vector<GameObject*>> & gameMap ) {}
 Buff::~Buff() {}
 string Buff::getName() const { return name; }
 Buff * Buff::clone () const { return new Buff ( *this ); }

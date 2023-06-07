@@ -19,6 +19,10 @@ class GameSettingsWrapper
 
 class GameMap : public Interface
 {
+	/*
+	* This class handles much of the game logic, the handleInput method
+	* is continuously running and updating much of the game logic
+	*/
 	public:
 		GameMap ();
 		GameMap ( const char * caption );
@@ -27,8 +31,6 @@ class GameMap : public Interface
 		void setDropChance ( int chance );
 		void print () override;
 		void handleInput () override;
-		int getSizeX();
-		int getSizeY();
 		~GameMap ();
 	private:
 		int sizeX, sizeY, startX, startY;
@@ -37,7 +39,7 @@ class GameMap : public Interface
 		void mapPrint ();
 		void playerInfoPrint( Player * p, int writeX, int writeY );
 		void printHearts ( int wx, int wy, int hp );
-		void swapper ( int a, int b, int c, int d, Player * p );
+		void swapper ( int a, int b, int c, int d, Player * p ); // swaps player position for an empty wall and vice versa
 		void handlePlayer ( char x, Player * player );
 		void handleAI();
 		bool isPosEmpty ( int i, int j );

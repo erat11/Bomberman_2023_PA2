@@ -5,7 +5,8 @@ using namespace std;
 
 
 int main ( void )
-{
+{   
+    //runs the game
     Game newGame;
     return 0;
 }

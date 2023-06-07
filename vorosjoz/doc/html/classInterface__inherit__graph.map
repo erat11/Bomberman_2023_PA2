@@ -1,0 +1,10 @@
+<map id="Interface" name="Interface">
+<area shape="rect" id="node1" title=" " alt="" coords="357,5,437,32"/>
+<area shape="rect" id="node2" href="$classGameMap.html" title=" " alt="" coords="5,80,95,107"/>
+<area shape="rect" id="node3" href="$classGetNameScreen.html" title=" " alt="" coords="119,80,247,107"/>
+<area shape="rect" id="node4" href="$classLeaderboard.html" title=" " alt="" coords="272,80,375,107"/>
+<area shape="rect" id="node5" href="$classMapChooseScreen.html" title=" " alt="" coords="399,80,541,107"/>
+<area shape="rect" id="node6" href="$classScoreTable.html" title=" " alt="" coords="565,80,657,107"/>
+<area shape="rect" id="node7" href="$classStartScreen.html" title=" " alt="" coords="681,80,779,107"/>
+<area shape="rect" id="node8" href="$classSettingsScreen.html" title=" " alt="" coords="671,155,789,181"/>
+</map>

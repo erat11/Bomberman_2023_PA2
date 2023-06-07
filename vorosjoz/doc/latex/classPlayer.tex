@@ -1,0 +1,163 @@
+\hypertarget{classPlayer}{}\doxysection{Player Class Reference}
+\label{classPlayer}\index{Player@{Player}}
+
+
+Inheritance diagram for Player\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=157pt]{classPlayer__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Player\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=307pt]{classPlayer__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classPlayer_a2647358d420d40a53b4251d041ecad5e}\label{classPlayer_a2647358d420d40a53b4251d041ecad5e}} 
+{\bfseries Player} (int x, int y, int hp, char r, const string \&name)
+\item 
+\mbox{\Hypertarget{classPlayer_a493faaf20eda13008affe92e6a2aafea}\label{classPlayer_a493faaf20eda13008affe92e6a2aafea}} 
+queue$<$ \mbox{\hyperlink{classBomb}{Bomb}} $\ast$ $>$ {\bfseries get\+Bomb\+Stack} () const
+\item 
+\mbox{\Hypertarget{classPlayer_aaa25d9817d6fd7ebc6a9bf4d0022e67f}\label{classPlayer_aaa25d9817d6fd7ebc6a9bf4d0022e67f}} 
+queue$<$ \mbox{\hyperlink{classBuff}{Buff}} $\ast$ $>$ {\bfseries get\+Buff\+Stack} () const
+\item 
+\mbox{\Hypertarget{classPlayer_a19ebf6fffc72b8467d3efb27690d6a1a}\label{classPlayer_a19ebf6fffc72b8467d3efb27690d6a1a}} 
+void {\bfseries add\+Buff} (\mbox{\hyperlink{classBuff}{Buff}} $\ast$b)
+\item 
+\mbox{\Hypertarget{classPlayer_abc2e63bd259816b0212e67c6710fce98}\label{classPlayer_abc2e63bd259816b0212e67c6710fce98}} 
+pair$<$ int, int $>$ {\bfseries get\+Pos} () const
+\item 
+\mbox{\Hypertarget{classPlayer_ace78e4652a1e39cc09498ac919ffd208}\label{classPlayer_ace78e4652a1e39cc09498ac919ffd208}} 
+void {\bfseries set\+Pos} (int i, int j)
+\item 
+\mbox{\Hypertarget{classPlayer_a4939193fc637f75bf7a11118334dae7e}\label{classPlayer_a4939193fc637f75bf7a11118334dae7e}} 
+string {\bfseries get\+Name} () const
+\item 
+\mbox{\Hypertarget{classPlayer_a8444a2c64c9192a1cfcac66e78f24ed8}\label{classPlayer_a8444a2c64c9192a1cfcac66e78f24ed8}} 
+bool {\bfseries bot} () const
+\item 
+\mbox{\Hypertarget{classPlayer_a172a4a96ac1486d420877d79cd286329}\label{classPlayer_a172a4a96ac1486d420877d79cd286329}} 
+void {\bfseries set\+Moveset} (char a, char b, char c, char d, char e, char f)
+\item 
+\mbox{\Hypertarget{classPlayer_afcf4962041c99b6b8c5921ee44b8ac7f}\label{classPlayer_afcf4962041c99b6b8c5921ee44b8ac7f}} 
+bool {\bfseries has\+In\+Moveset} (char k)
+\item 
+\mbox{\Hypertarget{classPlayer_a07a44d31b9e1ddd9350e16f46ce30e0e}\label{classPlayer_a07a44d31b9e1ddd9350e16f46ce30e0e}} 
+\mbox{\hyperlink{classMoveset}{Moveset}} {\bfseries get\+Moveset} () const
+\item 
+\mbox{\Hypertarget{classPlayer_aa5267c4b1e90dff31fde0f25c1342923}\label{classPlayer_aa5267c4b1e90dff31fde0f25c1342923}} 
+void {\bfseries place\+Bomb} (vector$<$ vector$<$ \mbox{\hyperlink{classGameObject}{Game\+Object}} $\ast$ $>$$>$ \&game\+Map)
+\item 
+\mbox{\Hypertarget{classPlayer_af8023cc0a8013583772af7267893158e}\label{classPlayer_af8023cc0a8013583772af7267893158e}} 
+pair$<$ int, int $>$ {\bfseries get\+Directed\+Pos} () const
+\item 
+\mbox{\Hypertarget{classPlayer_ab4fe6b2cff196eb7ddb2d2b6d000f0ff}\label{classPlayer_ab4fe6b2cff196eb7ddb2d2b6d000f0ff}} 
+void {\bfseries set\+HP} (int nhp) override
+\item 
+\mbox{\Hypertarget{classPlayer_a50d265a8a77c7ed62f31e7760410875d}\label{classPlayer_a50d265a8a77c7ed62f31e7760410875d}} 
+void {\bfseries activate\+Buff} (vector$<$ vector$<$ \mbox{\hyperlink{classGameObject}{Game\+Object}} $\ast$ $>$$>$ \&game\+Map)
+\item 
+\mbox{\Hypertarget{classPlayer_aa05fd0993added8dd49bf2570993edc5}\label{classPlayer_aa05fd0993added8dd49bf2570993edc5}} 
+\mbox{\hyperlink{classPlayer}{Player}} $\ast$ {\bfseries clone} () const override
+\item 
+\mbox{\Hypertarget{classPlayer_adf8b8f6450109e21ec367115f3aed248}\label{classPlayer_adf8b8f6450109e21ec367115f3aed248}} 
+void {\bfseries sync} (vector$<$ vector$<$ \mbox{\hyperlink{classGameObject}{Game\+Object}} $\ast$ $>$$>$ \&game\+Map)
+\item 
+\mbox{\Hypertarget{classPlayer_a2b111581a62b4251dbb7bc6929f549dc}\label{classPlayer_a2b111581a62b4251dbb7bc6929f549dc}} 
+int {\bfseries get\+HP} () const override
+\item 
+\mbox{\Hypertarget{classPlayer_a0028dd89ded20b9b030935b19c1ae6fc}\label{classPlayer_a0028dd89ded20b9b030935b19c1ae6fc}} 
+bool {\bfseries get\+Buff\+Active} () const
+\item 
+\mbox{\Hypertarget{classPlayer_a0d03355864becb7d70b09ec5040415b6}\label{classPlayer_a0d03355864becb7d70b09ec5040415b6}} 
+void {\bfseries decrease\+HP} (int d) override
+\item 
+\mbox{\Hypertarget{classPlayer_a1332b12e2e544169b327155936fb78c2}\label{classPlayer_a1332b12e2e544169b327155936fb78c2}} 
+bool {\bfseries is\+Destructable} () const override
+\item 
+\mbox{\Hypertarget{classPlayer_a67722f960d709e78972441ee473257f3}\label{classPlayer_a67722f960d709e78972441ee473257f3}} 
+bool {\bfseries wall\+Hack} () const
+\item 
+\mbox{\Hypertarget{classPlayer_ad624767d77a8cfe0dab69b216a356a61}\label{classPlayer_ad624767d77a8cfe0dab69b216a356a61}} 
+long long {\bfseries get\+Score} () const override
+\item 
+\mbox{\Hypertarget{classPlayer_a2723ccd904c9e94b5a16047658171b4a}\label{classPlayer_a2723ccd904c9e94b5a16047658171b4a}} 
+void {\bfseries add\+Score} (long long s)
+\item 
+\mbox{\Hypertarget{classPlayer_ac1e8fce87884f7d20bedc187facca0c6}\label{classPlayer_ac1e8fce87884f7d20bedc187facca0c6}} 
+int {\bfseries get\+Multiplier} () const
+\item 
+\mbox{\Hypertarget{classPlayer_a8508065fe8748f81007298d657cab526}\label{classPlayer_a8508065fe8748f81007298d657cab526}} 
+virtual bool {\bfseries get\+Move} () const
+\item 
+\mbox{\Hypertarget{classPlayer_a1d42c573f49ade7244d3105672b931ff}\label{classPlayer_a1d42c573f49ade7244d3105672b931ff}} 
+virtual void {\bfseries reset\+Move} ()
+\item 
+\mbox{\Hypertarget{classPlayer_af2832a1df864a6a911681a640aaf1cb7}\label{classPlayer_af2832a1df864a6a911681a640aaf1cb7}} 
+virtual void {\bfseries generate\+Move} (vector$<$ vector$<$ \mbox{\hyperlink{classGameObject}{Game\+Object}} $\ast$ $>$$>$ \&game\+Map)
+\item 
+\mbox{\Hypertarget{classPlayer_a2631cc43a35d3e69215774c941c6b981}\label{classPlayer_a2631cc43a35d3e69215774c941c6b981}} 
+virtual void {\bfseries freeze} ()
+\item 
+\mbox{\Hypertarget{classPlayer_aa8ec13dad44a50e899c3f41a842e7a00}\label{classPlayer_aa8ec13dad44a50e899c3f41a842e7a00}} 
+void {\bfseries set\+Direction} (int q)
+\item 
+\mbox{\Hypertarget{classPlayer_a55b80ad9f130005a6069fb39f0d349fa}\label{classPlayer_a55b80ad9f130005a6069fb39f0d349fa}} 
+int {\bfseries get\+Bomb\+Level} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classPlayer_abc6336fe904162280ab6f37cd2d5d004}\label{classPlayer_abc6336fe904162280ab6f37cd2d5d004}} 
+int {\bfseries p}
+\item 
+\mbox{\Hypertarget{classPlayer_a88a68af60bfbc410f8f8209f07e8c98a}\label{classPlayer_a88a68af60bfbc410f8f8209f07e8c98a}} 
+int {\bfseries mover}
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classPlayer_aec16d4c6774e71dc33d71bea10e2f95a}\label{classPlayer_aec16d4c6774e71dc33d71bea10e2f95a}} 
+void {\bfseries init\+Bomb\+Stack} ()
+\item 
+\mbox{\Hypertarget{classPlayer_aa77b03e4e48881ca01b466bc9c8932a8}\label{classPlayer_aa77b03e4e48881ca01b466bc9c8932a8}} 
+void {\bfseries reload\+Bomb\+Stack} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classPlayer_acfa53e80041e32153bc4b0f82bd365ae}\label{classPlayer_acfa53e80041e32153bc4b0f82bd365ae}} 
+\mbox{\hyperlink{structPlayerAttributes}{Player\+Attributes}} {\bfseries attributes}
+\item 
+\mbox{\Hypertarget{classPlayer_a7b48d21331e1daa81bcbf739fb9ef353}\label{classPlayer_a7b48d21331e1daa81bcbf739fb9ef353}} 
+\mbox{\hyperlink{classMoveset}{Moveset}} {\bfseries move}
+\item 
+\mbox{\Hypertarget{classPlayer_a412effdebc939e418f2428efc3e44a93}\label{classPlayer_a412effdebc939e418f2428efc3e44a93}} 
+queue$<$ \mbox{\hyperlink{classBomb}{Bomb}} $\ast$ $>$ {\bfseries bombs}
+\item 
+\mbox{\Hypertarget{classPlayer_ad093483241de456442c3876e115da606}\label{classPlayer_ad093483241de456442c3876e115da606}} 
+queue$<$ \mbox{\hyperlink{classBuff}{Buff}} $\ast$ $>$ {\bfseries buffs}
+\item 
+\mbox{\Hypertarget{classPlayer_acf0355128a99ee20ad9931b760fb2de1}\label{classPlayer_acf0355128a99ee20ad9931b760fb2de1}} 
+string {\bfseries name}
+\item 
+\mbox{\Hypertarget{classPlayer_a3a53e125a62e4c87c7a0eaa96a4c0c22}\label{classPlayer_a3a53e125a62e4c87c7a0eaa96a4c0c22}} 
+bool {\bfseries is\+Bot} = 0
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/Player.\+h\item 
+src/Player.\+cpp\end{DoxyCompactItemize}

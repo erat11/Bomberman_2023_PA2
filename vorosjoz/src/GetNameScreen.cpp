@@ -2,6 +2,9 @@
 
 class GetNameScreen : public Interface
 {
+	/*
+	* Name query screen
+	*/
 	public:
 		GetNameScreen () : Interface () {}
 		GetNameScreen ( const char * s ) : Interface ( s )
@@ -20,14 +23,14 @@ class GetNameScreen : public Interface
 			refresh();
 			writeX += 12;
 			writeY = ( maxY - 18 ) / 2;
-			mvprintw ( writeX, writeY, "( 1 to 32 letters )" );
+			mvprintw ( writeX, writeY, "( 1 to 16 letters )" );
 			writeX -= 6;
 			writeY = ( maxY - playerName.size() ) / 2;
 			mvprintw ( writeX, writeY, playerName.c_str() );
 		}
 		void handleInput () override
 		{
-			echo();
+			echo(); // enables letter input to be displayed on screen
 			int ch = ' ';
 			while ( 1 ) 
 			{

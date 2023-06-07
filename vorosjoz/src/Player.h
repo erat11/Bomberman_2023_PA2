@@ -53,7 +53,7 @@ class Player : public GameObject
 		~Player () override;
 		queue<Bomb*> getBombStack() const;
 		queue<Buff*> getBuffStack() const;
-		void addBuff ( Buff * b );
+		void addBuff ( Buff * b ); //pick up buff from map
 		pair<int, int> getPos () const;
 		void setPos ( int i, int j );
 		string getName() const;
@@ -88,8 +88,8 @@ class Player : public GameObject
 		queue<Buff*> buffs;
 		string name;
 		bool isBot = 0;
-		void initBombStack();
-		void reloadBombStack ();
+		void initBombStack(); // fill stack with level 1 bombs
+		void reloadBombStack (); // fill it with upgraded/downgraded bombs
 };
 
 #endif

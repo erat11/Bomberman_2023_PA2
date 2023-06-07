@@ -7,15 +7,18 @@
 class SettingsScreen : public StartScreen
 {
 	public:
-		SettingsScreen () : StartScreen () { mapChoice = false; }
+		SettingsScreen() : StartScreen () { mapChoice = false; }
 		SettingsScreen ( const vector<string> & v ) : StartScreen ( v ) { mapChoice = false; }
-		int getDropChance() { return dropChance; }
-		int getDollarChance() { return dollarChance; }
-		int getBaloons() { return baloons; }
-		int getDebuffs() { return debuffs; }
-		int getHP() { return hp; }
-		bool load ( )
+		int                getDropChance  ()       { return dropChance;   }
+		int                getDollarChance()       { return dollarChance; }
+		int                getBaloons     ()       { return baloons;      }
+		int                getDebuffs     ()       { return debuffs;      }
+		int                getHP          ()       { return hp;           }
+		bool               getChoice      () const { return mapChoice;    }
+		BuffChancesWrapper getBuffChances () const { return bC;           }
+		bool load()
 		{
+			// loading into variables from config files
 			ifstream settingsFile ( PATH_TO_SETTINGS );
 			ifstream buffDropFile ( PATH_TO_BUFF_DROP_CHANCE );
 			if ( settingsFile.is_open () && buffDropFile.is_open() ) 
@@ -44,14 +47,11 @@ class SettingsScreen : public StartScreen
 					return false;
 				}
 				buffDropFile.close();
-
 				return true;
 			}
-
-
 			return false;
 		}
-		void print () override
+		void print() override
 		{
 			checkSize();
 			clear();
@@ -60,16 +60,17 @@ class SettingsScreen : public StartScreen
 			mvprintw ( writeX, writeY, "Settings" );
 			for ( unsigned int i = 1; i < boxNames.size(); ++i )
 			{
-				if      (  boxNames[i] == "Drop Chance Percent"s  ) boxPrint ( boxNames[i].c_str(), dropChance );
+				//boxprint's second argument is set to -1, if there is no additional parameter
+				if      (  boxNames[i] == "Drop Chance Percent"s  ) boxPrint ( boxNames[i].c_str(), dropChance   );
 				else if (  boxNames[i] == "Dollar Chance Percent"s) boxPrint ( boxNames[i].c_str(), dollarChance );
-				else if (  boxNames[i] == "Debuffs On/Off"s       ) boxPrint ( boxNames[i].c_str(), debuffs );
-				else if (  boxNames[i] == "HP count"s) boxPrint ( boxNames[i].c_str(), hp );
-				else boxPrint ( boxNames[i].c_str(), -1 );
+				else if (  boxNames[i] == "Debuffs On/Off"s       ) boxPrint ( boxNames[i].c_str(), debuffs      );
+				else if (  boxNames[i] == "HP count"s             ) boxPrint ( boxNames[i].c_str(), hp           );
+				else                                                boxPrint ( boxNames[i].c_str(), -1           );
 				writeX += 1;
 			}
 			refresh();
 		}
-		void handleInput () override
+		void handleInput() override
 		{
 			MEVENT event;
 			int ch = '!';
@@ -82,37 +83,37 @@ class SettingsScreen : public StartScreen
 						if ( z.topLeftX <= event.y && z.topLeftY <= event.x &&
 						 z.bottomRightX >= event.y && z.bottomRightY >= event.x )
 						{
-							if      ( z.jumpTo == "Reset Default & Exit"  ) { reset(); return; }
-							else if ( z.jumpTo == "Save & Exit"           ) { save(); return; }
-							else if ( z.jumpTo == "Drop Chance Percent"   ) { increaseDC(); }
-							else if ( z.jumpTo == "Dollar Chance Percent" ) { increaseD(); }
-							else if ( z.jumpTo == "HP count"              ) { increaseHP(); }
-							else if ( z.jumpTo == "Debuffs On/Off"        ) { debuffs = ! debuffs; }
+							//click event happened in the button dimensions creaded and stored by boxprint
+							if      ( z.jumpTo == "Reset Default & Exit"  ) { reset(); return;          }
+							else if ( z.jumpTo == "Save & Exit"           ) { save(); return;           }
+							else if ( z.jumpTo == "Drop Chance Percent"   ) { increaseDC();             }
+							else if ( z.jumpTo == "Dollar Chance Percent" ) { increaseD();              }
+							else if ( z.jumpTo == "HP count"              ) { increaseHP();             }
+							else if ( z.jumpTo == "Debuffs On/Off"        ) { debuffs = ! debuffs;      }
 							else if ( z.jumpTo == "Choose Map"            ) { mapChoice = true; return; }
 						}
 				ch = '!';
 			}
 		}
-		bool getChoice () const { return mapChoice; }
-		BuffChancesWrapper getBuffChances () const { return bC; }
 	private:
 		int dropChance, dollarChance, baloons, debuffs, hp;
 		BuffChancesWrapper bC;
 		bool mapChoice;
 		void save ()
 		{
-			ofstream settings( PATH_TO_SETTINGS );
-			settings << "DROP_CHANCE=" << dropChance << endl;
+			ofstream settings ( PATH_TO_SETTINGS );
+			settings << "DROP_CHANCE="   << dropChance   << endl;
 			settings << "DOLLAR_CHANCE=" << dollarChance << endl;
-			settings << "BALOONS=" << baloons << endl;
-			settings << "DEBUFFS=" << debuffs << endl;
-			settings << "HP=" << hp << endl;
+			settings << "BALOONS="       << baloons      << endl;
+			settings << "DEBUFFS="       << debuffs      << endl;
+			settings << "HP="            << hp           << endl;
 		}
 		void reset ()
 		{
-			ifstream defaultSettings( PATH_TO_DEFAULT );
-			ofstream settings( PATH_TO_SETTINGS );
-			if ( ! defaultSettings.is_open() || ! settings.is_open()  ) cout << "error loading default";
+			//restores defaults from "default" file
+			ifstream defaultSettings ( PATH_TO_DEFAULT );
+			ofstream settings ( PATH_TO_SETTINGS );
+			if ( ! defaultSettings.is_open() || ! settings.is_open()  ) { cout << "error loading default"; return; }
 			string line;
 			while ( getline ( defaultSettings, line ) ) settings << line << endl;
 		}

@@ -1,0 +1,10 @@
+<map id="Buff" name="Buff">
+<area shape="rect" id="node1" title=" " alt="" coords="309,80,357,107"/>
+<area shape="rect" id="node3" href="$classBombUpgrade.html" title=" " alt="" coords="5,155,120,181"/>
+<area shape="rect" id="node4" href="$classExplode.html" title=" " alt="" coords="144,155,219,181"/>
+<area shape="rect" id="node5" href="$classGainHP.html" title=" " alt="" coords="243,155,314,181"/>
+<area shape="rect" id="node6" href="$classScoreBonus.html" title=" " alt="" coords="339,155,437,181"/>
+<area shape="rect" id="node7" href="$classScoreMultiplier.html" title=" " alt="" coords="461,155,581,181"/>
+<area shape="rect" id="node8" href="$classTimeBasedBuff.html" title=" " alt="" coords="606,155,727,181"/>
+<area shape="rect" id="node2" href="$classGameObject.html" title=" " alt="" coords="282,5,385,32"/>
+</map>

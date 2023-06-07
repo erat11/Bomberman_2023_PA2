@@ -7,7 +7,7 @@ class AI : public Player
 		AI ( int x, int y, int hp, char r, const string & name ) : Player ( x, y, hp, r, name ) 
 		{ 
 			this->isBot = 1; 
-			updateSpeed = 300;
+			updateSpeed = 300;//300 instances of update
 			counter = 0;
 			moveCommand = false;
 			mover = -1;
@@ -28,6 +28,9 @@ class AI : public Player
 		void resetMove () override { moveCommand = false; }
 		void generateMove ( vector<vector<GameObject*>> & gameMap ) override
 		{
+			/*
+			* BFS for player ( type 2 ), if no path is found, bomb the walls
+			*/
 			if ( buffs.size() && !getBuffActive() ) mover = 4;
 			else if ( moveQ.size() )
 			{
@@ -50,7 +53,7 @@ class AI : public Player
 			else bombWalls ( gameMap );
 		}
 		AI * clone () const { return new AI ( *this ); }
-		void freeze () override { wait = 10000; }
+		void freeze () override { wait = 10000; } //wait for 10000 updates to wait until the detonation is done
 	private:
 		pair<int,int> nextMove;
 		queue<int> moveQ;
@@ -61,8 +64,10 @@ class AI : public Player
 		{
 			int numRows = gameMap.size();
 			int numCols = gameMap[0].size();
-			vector<vector<pair<bool, pair<int, int>>>> visited(numRows, vector<pair<bool, pair<int, int>>>
-				(numCols, make_pair(false, make_pair(attributes.mapPos.first, attributes.mapPos.second))));
+			//vector of coordinates and bool values, the bool is representing wheather or not the pos has been visited
+			vector<vector<pair<bool, pair<int, int>>>> visited ( numRows, vector<pair<bool, pair<int, int>>>
+				(numCols, make_pair ( false, make_pair ( attributes.mapPos.first, attributes.mapPos.second ) ) ) );
+
 			// Define the possible neighbor directions (up, down, left, right)
 			int dr[] = {0, -1, 1, 0};
 			int dc[] = {-1, 0, 0, 1};
@@ -121,6 +126,7 @@ class AI : public Player
 		}
 		void runAway ( )
 		{
+			//decides where to run based on direction
 			int a, b;
 			switch( move.direction() )
 			{
@@ -161,10 +167,11 @@ class AI : public Player
 		void bombWalls ( vector<vector<GameObject*>> & gameMap )
 		{
 			p = calculateDistance();
+			//prioritize picking up buffs if no path to the enemy player is available, which are type 8
 			if ( bfs ( gameMap, 8 ) ) moveToGoal( gameMap, nextMove.first, nextMove.second );
 			else
 			{
-				bfs ( gameMap, 6 );
+				bfs ( gameMap, 6 ); // bfs for the nearest ~ wall
 				if ( p > 3 ) moveToGoal( gameMap, nextMove.first, nextMove.second );
 				else 
 				{
@@ -172,7 +179,9 @@ class AI : public Player
 					runAway();
 				}
 			}
-			
 		}
-		int calculateDistance () { return abs ( attributes.mapPos.first - targerPos.first ) + abs ( attributes.mapPos.second - targerPos.second ); }
+		int calculateDistance () 
+		{ 
+			return abs ( attributes.mapPos.first - targerPos.first ) + abs ( attributes.mapPos.second - targerPos.second ); 
+		}
 };

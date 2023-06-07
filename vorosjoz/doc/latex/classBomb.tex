@@ -1,0 +1,103 @@
+\hypertarget{classBomb}{}\doxysection{Bomb Class Reference}
+\label{classBomb}\index{Bomb@{Bomb}}
+
+
+Inheritance diagram for Bomb\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=157pt]{classBomb__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Bomb\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=157pt]{classBomb__coll__graph}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classBomb_a2525c09059a4e0e384ec013f102c8f16}\label{classBomb_a2525c09059a4e0e384ec013f102c8f16}} 
+{\bfseries Bomb} (bool p)
+\item 
+\mbox{\Hypertarget{classBomb_ad97f5d3f6e5765e4b70a6daf75ea38f3}\label{classBomb_ad97f5d3f6e5765e4b70a6daf75ea38f3}} 
+void {\bfseries light\+Bomb} ()
+\item 
+\mbox{\Hypertarget{classBomb_ac9f0a66db2de81b3d65d46737d016bd0}\label{classBomb_ac9f0a66db2de81b3d65d46737d016bd0}} 
+void {\bfseries detonate} (vector$<$ vector$<$ \mbox{\hyperlink{classGameObject}{Game\+Object}} $\ast$ $>$$>$ \&game\+Map)
+\item 
+\mbox{\Hypertarget{classBomb_a232b26dd8fd64f306b8f6047900e0567}\label{classBomb_a232b26dd8fd64f306b8f6047900e0567}} 
+bool {\bfseries ready} (vector$<$ vector$<$ \mbox{\hyperlink{classGameObject}{Game\+Object}} $\ast$ $>$$>$ game\+Map)
+\item 
+\mbox{\Hypertarget{classBomb_a4537c05f25352b4e5c5b52a685d2e905}\label{classBomb_a4537c05f25352b4e5c5b52a685d2e905}} 
+pair$<$ int, int $>$ {\bfseries get\+Pos} () const
+\item 
+\mbox{\Hypertarget{classBomb_a03f0b622365240b428cf06cbfdb7fe93}\label{classBomb_a03f0b622365240b428cf06cbfdb7fe93}} 
+void {\bfseries set\+Pos} (int i, int j)
+\item 
+\mbox{\Hypertarget{classBomb_a03339cc58dabf7e00db6898bc019eb6f}\label{classBomb_a03339cc58dabf7e00db6898bc019eb6f}} 
+void {\bfseries upgrade} (int i)
+\item 
+\mbox{\Hypertarget{classBomb_aea44cf4b9aabcd5b61769b902eddbfa2}\label{classBomb_aea44cf4b9aabcd5b61769b902eddbfa2}} 
+\mbox{\hyperlink{classBomb}{Bomb}} $\ast$ {\bfseries clone} () const override
+\item 
+\mbox{\Hypertarget{classBomb_aeb29c3522c5cf9ff89942c3360a7d224}\label{classBomb_aeb29c3522c5cf9ff89942c3360a7d224}} 
+bool {\bfseries get\+Player} () const
+\item 
+\mbox{\Hypertarget{classBomb_a55d66eae0c2a273acbcf78c9659b0635}\label{classBomb_a55d66eae0c2a273acbcf78c9659b0635}} 
+long long {\bfseries get\+Score} () const override
+\item 
+\mbox{\Hypertarget{classBomb_aeeac236402a0974cd405cbdd76963514}\label{classBomb_aeeac236402a0974cd405cbdd76963514}} 
+int {\bfseries get\+Level} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classBomb_a12a1753c7507770d73960ffb384aaa5a}\label{classBomb_a12a1753c7507770d73960ffb384aaa5a}} 
+void {\bfseries explode\+Side} (vector$<$ vector$<$ \mbox{\hyperlink{classGameObject}{Game\+Object}} $\ast$ $>$$>$ \&game\+Map, int i, int j, int dir)
+\item 
+\mbox{\Hypertarget{classBomb_ae8df1b39b1a4d57675dae219c2b5ce74}\label{classBomb_ae8df1b39b1a4d57675dae219c2b5ce74}} 
+void {\bfseries explode\+Side} (vector$<$ vector$<$ \mbox{\hyperlink{classGameObject}{Game\+Object}} $\ast$ $>$$>$ \&game\+Map, int i, int j, pair$<$ int, int $>$ p)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classBomb_af6687daff34a376f82b8cde23cd0e2c5}\label{classBomb_af6687daff34a376f82b8cde23cd0e2c5}} 
+int {\bfseries exp\+Radius}
+\item 
+\mbox{\Hypertarget{classBomb_a9be87c4e94c7b83978f4793a305bbf2b}\label{classBomb_a9be87c4e94c7b83978f4793a305bbf2b}} 
+int {\bfseries detonation\+Time}
+\item 
+\mbox{\Hypertarget{classBomb_aa868980bd10a825153cc368d1d347e8b}\label{classBomb_aa868980bd10a825153cc368d1d347e8b}} 
+int {\bfseries damage}
+\item 
+\mbox{\Hypertarget{classBomb_a557bc37312dacf5dae1eff309079da6e}\label{classBomb_a557bc37312dacf5dae1eff309079da6e}} 
+int {\bfseries exp\+Width}
+\item 
+\mbox{\Hypertarget{classBomb_aa5ff31652d8435a1b63cec8b2d255d1b}\label{classBomb_aa5ff31652d8435a1b63cec8b2d255d1b}} 
+int {\bfseries score}
+\item 
+\mbox{\Hypertarget{classBomb_a4e870a332d78ca8b17151c3f31c0be44}\label{classBomb_a4e870a332d78ca8b17151c3f31c0be44}} 
+int {\bfseries level}
+\item 
+\mbox{\Hypertarget{classBomb_ad9741e9b93fa96bf83f3adfc7ea68050}\label{classBomb_ad9741e9b93fa96bf83f3adfc7ea68050}} 
+bool {\bfseries player}
+\item 
+\mbox{\Hypertarget{classBomb_aea4713941cd7bcc6d4acfc061d7c4178}\label{classBomb_aea4713941cd7bcc6d4acfc061d7c4178}} 
+pair$<$ int, int $>$ {\bfseries map\+Pos}
+\item 
+\mbox{\Hypertarget{classBomb_a00c7edb1be51c5a24168cc9a3c1b30be}\label{classBomb_a00c7edb1be51c5a24168cc9a3c1b30be}} 
+chrono\+::system\+\_\+clock\+::time\+\_\+point {\bfseries start}
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/Bomb.\+h\item 
+src/Bomb.\+cpp\end{DoxyCompactItemize}

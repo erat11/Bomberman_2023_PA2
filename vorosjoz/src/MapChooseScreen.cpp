@@ -5,6 +5,10 @@
 
 class MapChooseScreen : public Interface
 {
+	/*
+	*  Prints a map with two buttons: choose current map and next map
+	*  exits after the first one, moves the index on the second
+	*/
 	public:
 		MapChooseScreen() : Interface ( "Choose your Map" )
 		{
@@ -14,7 +18,7 @@ class MapChooseScreen : public Interface
 			handleInput();
 			sizeX = 0; sizeY = 0;
 		}
-		void load ()
+		void load()
 		{
 			ifstream file ( PATH_TO_MAP_NAMES );
 			string line;
@@ -25,7 +29,7 @@ class MapChooseScreen : public Interface
 			}
 			if ( mapNames.size() ) readMap();
 		}
-		void print () override
+		void print() override
 		{
 			clear();
 			refresh();

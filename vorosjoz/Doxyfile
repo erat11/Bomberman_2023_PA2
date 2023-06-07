@@ -1,0 +1,4 @@
+Doxyfile:
+	OUTPUT_DIRECTORY       = doc
+	INPUT                  = src
+	RECURSIVE              = YES

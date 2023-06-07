@@ -4,10 +4,7 @@ int Wall::dropChance = 0;
 
 GameMap::GameMap () : Interface () {}
 
-GameMap::GameMap ( const char * caption ) : Interface ( caption )
-{
-
-}
+GameMap::GameMap ( const char * caption ) : Interface ( caption ) {}
 
 GameMap::~GameMap()
 {
@@ -46,7 +43,6 @@ bool GameMap::load ( const string & s1, const string & s2, GameSettingsWrapper g
 			gameMap.push_back ( tmp );
 		}
 		file.close();
-		//todo verify map integrity
 		player1 = new Player ( 1, 1, gsw.hp, 'P', s1 );
 		player1->setMoveset( 'w', 's', 'a', 'd', ' ', 'b' );
 		if ( s2 == "BOT" ) player2 = new AI ( sizeX - 2, sizeY - 2, gsw.hp, 'Q', s2 );
@@ -65,6 +61,7 @@ bool GameMap::load ( const string & s1, const string & s2, GameSettingsWrapper g
 
 void GameMap::addDollars ( int chance )
 {
+	//adds dolar walls randomly to the map
 	for ( unsigned int i = 0; i < gameMap.size(); ++i )
 	{
 		for ( unsigned int j = 0; j < gameMap[i].size(); ++j )
@@ -108,7 +105,8 @@ void GameMap::handleInput ()
 
 void GameMap::winScreen( )
 {
-	napms(1000);
+	//happens after a player wins the game
+	napms(1500);
 	string winner;
 	long long winnerScore = 0;
 	if ( player1->getHP() <= 0 ) { winner = player2->getName(); winnerScore = player2->getScore(); }
@@ -121,7 +119,7 @@ void GameMap::winScreen( )
 	writeY += winner.size() + 1;
 	mvprintw( writeX, writeY, "WINS!" );
 	refresh();
-	napms(2500);
+	napms(2500);//show winners name for 2.5s
 	Leaderboard l = Leaderboard ();
 	l.save( winner, winnerScore );
 }
@@ -157,10 +155,6 @@ void GameMap::handleAI()
 	}
 	player2->resetMove(); 
 }
-
-int GameMap::getSizeX() { return sizeX; }
-
-int GameMap::getSizeY() { return sizeY; }
 
 void GameMap::mapPrint ()	
 {

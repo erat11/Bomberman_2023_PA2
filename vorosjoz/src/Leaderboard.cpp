@@ -14,16 +14,17 @@ class Leaderboard : public Interface
 		}
 		static bool scoreCmp(const pair<string, int>& pair1, const pair<string, int>& pair2) 
 		{
-    		return !(pair1.second < pair2.second);
+			//sort function comparator
+    		return !( pair1.second < pair2.second );
 		}
-		void load ( )
+		void load ()
 		{
 			ifstream file ( PATH_TO_FILE );
 			string line, name;
 			int score;
 			while ( getline ( file, line ) )
 			{
-				if ( !checkFormat ( line, "\\s*(\\d+)\\s*=\\s*(\\S+)\\s*", score ) )
+				if ( !checkFormat ( line, "\\s*(\\d+)\\s*=\\s*(\\S+)\\s*", score ) )//int=string format check
 					return;
 				size_t pos = line.find('=');
 				name = line.substr(pos + 1, line.size() - 1);
@@ -35,7 +36,7 @@ class Leaderboard : public Interface
 		void save ( string name, int score )
 		{
 			ofstream file( PATH_TO_FILE, ios::app );
-			file <<  score <<'=' << name << endl;
+			file <<  score << '=' << name << endl;
 			file.close();
 		}
 		void print () override
@@ -49,7 +50,7 @@ class Leaderboard : public Interface
 			if ( !results.size() ) 
 			{
 				writeX = maxX / 10;
-				writeY = ( maxY - strlen("Leaderboard Empty! Play some games to change this!") ) / 2;
+				writeY = ( maxY - strlen( "Leaderboard Empty! Play some games to change this!" ) ) / 2;
 				mvprintw ( writeX, writeY, "Leaderboard Empty! Play some games to change this!" );
 			}
 			int i = 1;
@@ -88,5 +89,5 @@ class Leaderboard : public Interface
 			}
 		}
 	private:
-		vector<pair<string, int>> results;
+		vector<pair<string, int>> results; // storage structure
 };

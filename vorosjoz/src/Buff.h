@@ -7,6 +7,7 @@
 
 struct PlayerAttributes
 {
+	//encapsulates player attributes, so the modification through buffs is easier
 	pair<int, int> mapPos;
 	int speed, hp;
 	long long score;

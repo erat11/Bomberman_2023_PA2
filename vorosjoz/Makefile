@@ -16,4 +16,15 @@ clean:
 deps: 
 	$(CXX) -MM src/*cpp > Makefile.d
 
+compile: src/main.cpp src/GameObject.cpp src/Interface.cpp src/Bomb.cpp src/Buff.cpp src/GameMap.cpp src/Player.cpp src/StartScreen.cpp
+	$(CXX) $(CXXFLAGS) -o vorosjoz $^
+
+run: vorosjoz
+	./vorosjoz
+
+doc: Doxyfile
+	doxygen Doxyfile
+
+.PHONY: doc
+
 -include Makefile.d

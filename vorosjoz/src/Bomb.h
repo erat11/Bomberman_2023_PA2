@@ -14,7 +14,7 @@ class Bomb : public GameObject
 		Bomb ( bool p );
 		void lightBomb();
 		void detonate ( vector<vector<GameObject*>> & gameMap );
-		bool ready( vector<vector<GameObject*>> gameMap );
+		bool ready ( vector<vector<GameObject*>> gameMap );
 		pair<int, int> getPos () const;
 		void setPos ( int i, int j );
 		void upgrade ( int i );
@@ -27,8 +27,8 @@ class Bomb : public GameObject
 		bool player; //0 = player1, 1 = player2
 		pair<int, int> mapPos;
 		chrono::system_clock::time_point start;
-		void explodeSide( vector<vector<GameObject*>> & gameMap, int i, int j, int dir );
-		void explodeSide( vector<vector<GameObject*>> & gameMap, int i, int j, pair<int, int> p );
+		void explodeSide ( vector<vector<GameObject*>> & gameMap, int i, int j, int dir );
+		void explodeSide ( vector<vector<GameObject*>> & gameMap, int i, int j, pair<int, int> p );
 };
 
 #endif
